@@ -8,16 +8,18 @@ export function WhatsAppQuoteModal({
   isOpen,
   onClose,
   initialCategory,
+  quotedPhoto,
 }: {
   isOpen: boolean
   onClose: () => void
   initialCategory?: string
+  quotedPhoto?: { title: string; publicUrl: string } | null
 }) {
   const { config } = useConfiguracion()
 
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
-  const [eventType, setEventType] = useState(initialCategory || 'Boda')
+  const [eventType, setEventType] = useState(initialCategory || 'Boda & Recepción')
   const [eventDate, setEventDate] = useState('')
   const [guestCount, setGuestCount] = useState('100')
   const [notes, setNotes] = useState('')
@@ -25,14 +27,19 @@ export function WhatsAppQuoteModal({
   if (!isOpen) return null
 
   const handleSendQuote = () => {
+    const photoLine = quotedPhoto
+      ? `- *Diseño de Referencia*: ${quotedPhoto.title}\n- *Ver Foto*: ${quotedPhoto.publicUrl}\n`
+      : ''
+
     const text = `Hola *${config.businessName}*, deseo cotizar una decoración:\n\n` +
       `- *Cliente*: ${name || 'Sin especificar'}\n` +
       `- *Teléfono*: ${phone || 'Sin especificar'}\n` +
       `- *Tipo de Evento*: ${eventType}\n` +
       `- *Fecha Estimada*: ${eventDate || 'Por definir'}\n` +
       `- *Invitados aprox.*: ${guestCount}\n` +
+      photoLine +
       (notes ? `- *Detalles/Colores*: ${notes}\n\n` : '\n') +
-      `¿Podrían brindarme disponibilidad y opciones de paquetes de gala? Muchas gracias.`
+      `¿Podrían confirmarme disponibilidad y paquetes de gala? Muchas gracias.`
 
     const url = buildWhatsAppLink(config.whatsappPhone, text)
     window.open(url, '_blank')
@@ -57,7 +64,25 @@ export function WhatsAppQuoteModal({
           </button>
         </div>
 
-        <div className="space-y-4 max-h-[65vh] overflow-y-auto pr-1">
+        {/* Banner de Diseño / Fotografía seleccionada */}
+        {quotedPhoto && (
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-[#16161B] border border-[#D4AF37]/40">
+            <img
+              src={quotedPhoto.publicUrl}
+              alt={quotedPhoto.title}
+              className="w-14 h-14 object-cover rounded-lg border border-[#D4AF37]/30"
+            />
+            <div className="flex-1 min-w-0">
+              <span className="text-[10px] uppercase tracking-wider text-[#D4AF37] font-semibold block">
+                Diseño seleccionado del catálogo
+              </span>
+              <p className="text-xs font-bold text-[#F9F6F0] truncate">{quotedPhoto.title}</p>
+              <p className="text-[11px] text-[#7D7568]">Se adjuntará el enlace directo en el mensaje</p>
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
           <VvTextInput
             label="Tu Nombre Completo"
             placeholder="Ej: Verónica Méndez"

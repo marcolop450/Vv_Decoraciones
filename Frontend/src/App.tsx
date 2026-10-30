@@ -17,6 +17,7 @@ export function App() {
   const [currentPath, setCurrentPath] = useState<string>('/')
   const [isQuoteOpen, setIsQuoteOpen] = useState(false)
   const [selectedPhoto, setSelectedPhoto] = useState<VvPhoto | null>(null)
+  const [photoForQuote, setPhotoForQuote] = useState<VvPhoto | null>(null)
   const { user, signOut } = useSupabaseAuth()
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false)
 
@@ -97,13 +98,20 @@ export function App() {
       {/* Modales Interactivos */}
       <WhatsAppQuoteModal
         isOpen={isQuoteOpen}
-        onClose={() => setIsQuoteOpen(false)}
+        onClose={() => {
+          setIsQuoteOpen(false)
+          setPhotoForQuote(null)
+        }}
+        quotedPhoto={photoForQuote}
       />
 
       <EventDetailModal
         photo={selectedPhoto}
         onClose={() => setSelectedPhoto(null)}
-        onInquire={() => setIsQuoteOpen(true)}
+        onInquire={(photoTitle) => {
+          setPhotoForQuote(selectedPhoto)
+          setIsQuoteOpen(true)
+        }}
       />
     </PublicLayout>
   )
