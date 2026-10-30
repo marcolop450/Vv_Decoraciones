@@ -147,11 +147,23 @@ export function VvCard({
   )
 }
 
-export function VvOrnamentDivider({ className = '' }: { className?: string }) {
+export function VvOrnamentDivider({
+  label,
+  className = '',
+}: {
+  label?: string
+  className?: string
+}) {
   return (
     <div className={`flex items-center justify-center gap-3 my-6 ${className}`}>
       <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-[#D4AF37]/40" />
-      <span className="w-2 h-2 rotate-45 border border-[#D4AF37] bg-[#D4AF37]/20" />
+      {label ? (
+        <span className="text-xs uppercase tracking-widest font-semibold vv-text-gold-light px-2 whitespace-nowrap">
+          {label}
+        </span>
+      ) : (
+        <span className="w-2 h-2 rotate-45 border border-[#D4AF37] bg-[#D4AF37]/20" />
+      )}
       <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-[#D4AF37]/40" />
     </div>
   )

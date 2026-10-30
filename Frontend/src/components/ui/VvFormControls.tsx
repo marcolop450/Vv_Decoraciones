@@ -1,4 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useVvApp } from '../../context/VvAppContext'
+import { VvBadge, VvButton } from './VvPrimitives'
 
 export interface VvTextInputProps {
   label: string
@@ -21,12 +23,14 @@ export function VvTextInput({
   required,
   helperText,
 }: VvTextInputProps) {
+  const inputId = React.useId()
   return (
     <div className="space-y-1.5">
-      <label className="block text-xs font-semibold uppercase tracking-wider vv-text-secondary">
+      <label htmlFor={inputId} className="block text-xs font-semibold uppercase tracking-wider vv-text-secondary">
         {label} {required && <span className="vv-text-gold">*</span>}
       </label>
       <input
+        id={inputId}
         type={type}
         min={min}
         value={value}
@@ -58,18 +62,166 @@ export function VvTextArea({
   rows = 3,
   required,
 }: VvTextAreaProps) {
+  const areaId = React.useId()
   return (
     <div className="space-y-1.5">
-      <label className="block text-xs font-semibold uppercase tracking-wider vv-text-secondary">
+      <label htmlFor={areaId} className="block text-xs font-semibold uppercase tracking-wider vv-text-secondary">
         {label} {required && <span className="vv-text-gold">*</span>}
       </label>
       <textarea
+        id={areaId}
         rows={rows}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className="w-full px-3.5 py-2.5 rounded-xl vv-bg-subtle border vv-border-gold vv-text-primary text-sm focus:outline-none focus:border-[#F3D37A] transition-colors resize-none"
       />
+    </div>
+  )
+}
+
+export function VvInlineInput({
+  type = 'text',
+  value,
+  onChange,
+  onKeyDown,
+  placeholder,
+  min,
+  className = '',
+}: {
+  type?: 'text' | 'date' | 'number' | 'email' | 'password'
+  value: string
+  onChange: (value: string) => void
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
+  placeholder?: string
+  min?: string
+  className?: string
+}) {
+  return (
+    <input
+      type={type}
+      min={min}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      onKeyDown={onKeyDown}
+      placeholder={placeholder}
+      className={`px-3.5 py-2.5 rounded-xl vv-bg-subtle border vv-border-gold vv-text-primary text-sm focus:outline-none focus:border-[#F3D37A] transition-colors ${className}`}
+    />
+  )
+}
+
+export function VvFilePicker({
+  onImageLoaded,
+}: {
+  onImageLoaded: (dataUrl: string) => void
+}) {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        onImageLoaded(reader.result)
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+
+  return (
+    <input
+      type="file"
+      accept="image/*"
+      onChange={handleFileChange}
+      className="block w-full text-xs vv-text-secondary file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:vv-bg-subtle file:vv-text-primary cursor-pointer"
+    />
+  )
+}
+
+export function CategorySelectorWithInlineCreate({
+  selectedCategoryId,
+  onSelectCategory,
+  label = 'Categoría',
+}: {
+  selectedCategoryId: string
+  onSelectCategory: (categoryId: string) => void
+  label?: string
+}) {
+  const { state, addCategory } = useVvApp()
+  const [isCreatingNew, setIsCreatingNew] = useState(false)
+  const [newCategoryName, setNewCategoryName] = useState('')
+  const [feedback, setFeedback] = useState<string | null>(null)
+
+  const handleCreateCategory = () => {
+    const created = addCategory(newCategoryName)
+    if (!created) return
+    onSelectCategory(created.id)
+    setNewCategoryName('')
+    setIsCreatingNew(false)
+    setFeedback(`Categoría "${created.name}" creada y seleccionada`)
+    setTimeout(() => setFeedback(null), 2500)
+  }
+
+  return (
+    <div className="space-y-2.5 p-3.5 rounded-xl vv-bg-elevated border vv-border-gold">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="text-xs font-semibold uppercase tracking-wider vv-text-secondary">
+          {label} <span className="vv-text-gold">*</span>
+        </span>
+        <VvButton
+          size="sm"
+          variant={isCreatingNew ? 'ghost' : 'outline'}
+          onClick={() => setIsCreatingNew(!isCreatingNew)}
+        >
+          {isCreatingNew ? 'Cancelar' : '+ Nueva Categoría'}
+        </VvButton>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {state.categories.map((cat) => {
+          const isSelected = cat.id === selectedCategoryId
+          return (
+            <VvButton
+              key={cat.id}
+              size="sm"
+              variant={isSelected ? 'gold' : 'subtle'}
+              onClick={() => onSelectCategory(cat.id)}
+            >
+              {cat.name}
+            </VvButton>
+          )
+        })}
+      </div>
+
+      {isCreatingNew && (
+        <div className="pt-2 border-t vv-border-gold space-y-2">
+          <div className="text-xs vv-text-gold-light font-medium">
+            Registrar nueva categoría sin salir del formulario:
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <input
+              type="text"
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+              placeholder="Ej. Aniversarios, Graduaciones, Baby Shower..."
+              className="flex-1 px-3 py-2 rounded-lg vv-bg-subtle border vv-border-gold-strong vv-text-primary text-xs focus:outline-none"
+            />
+            <VvButton
+              size="sm"
+              variant="gold"
+              onClick={handleCreateCategory}
+              disabled={!newCategoryName.trim()}
+            >
+              Guardar Categoría
+            </VvButton>
+          </div>
+        </div>
+      )}
+
+      {feedback && (
+        <div className="pt-1">
+          <VvBadge variant="success">{feedback}</VvBadge>
+        </div>
+      )}
     </div>
   )
 }
@@ -99,28 +251,37 @@ export function VvImageDropzone({
       </label>
       <div
         onClick={() => fileInputRef.current?.click()}
-        className="border-2 border-dashed border-[#D4AF37]/40 hover:border-[#F3D37A] rounded-2xl p-6 text-center cursor-pointer transition-all bg-[#0E0E11]/80 hover:bg-[#16161B]"
+        className="w-full p-4 rounded-xl border border-dashed vv-border-gold hover:border-[#F3D37A] bg-[#0E0E11] text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2"
       >
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/jpeg,image/png,image/webp,image/avif"
+          accept="image/*"
           onChange={handleFile}
           className="hidden"
         />
         {previewUrl ? (
-          <div className="relative mx-auto max-h-48 rounded-xl overflow-hidden">
-            <img src={previewUrl} alt="Vista previa" className="mx-auto max-h-48 object-cover rounded-xl" />
-            <span className="inline-block mt-2 text-xs text-[#D4AF37]">Haz clic para cambiar la imagen</span>
+          <div className="relative w-full h-36 rounded-lg overflow-hidden border border-[#D4AF37]/40">
+            <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
           </div>
         ) : (
-          <div className="space-y-2">
-            <div className="w-10 h-10 mx-auto rounded-full bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37]">
-              +
-            </div>
-            <p className="text-sm font-medium text-[#F9F6F0]">Arrastra tu fotografía o haz clic aquí</p>
-            <p className="text-xs text-[#7D7568]">JPG, PNG, WEBP hasta 10MB</p>
-          </div>
+          <>
+            <svg
+              className="w-8 h-8 text-[#D4AF37]"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.5}
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            <span className="text-xs text-[#C4B9A5]">
+              Arrastra una foto o haz clic para seleccionarla
+            </span>
+            <span className="text-[10px] text-[#C4B9A5]">
+              JPG, PNG o WebP de alta resolución
+            </span>
+          </>
         )}
       </div>
     </div>
