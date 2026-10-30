@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { VvButton, VvHeading, VvBadge, VvCard } from '../../components/ui/VvPrimitives'
 import { VvTextInput, VvTextArea } from '../../components/ui/VvFormControls'
+import { VvModal } from '../../components/ui/VvModal'
 import { useEventos } from '../../hooks/useEventos'
 import { formatBs, formatReadableDate } from '../../lib/utils'
 import type { EventStatus } from '@eventos-vero/shared'
@@ -158,51 +159,39 @@ export function AdminEventosPage() {
       )}
 
       {/* Modal de Creación de Evento */}
-      {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm vv-animate-modal">
-          <form
-            onSubmit={handleCreate}
-            className="w-full max-w-lg rounded-2xl bg-[#0E0E11] border border-[#D4AF37]/60 p-6 space-y-4"
-          >
-            <div className="flex justify-between items-center border-b border-[#D4AF37]/20 pb-3">
-              <VvHeading level={3} variant="serif" metallic>
-                Registrar Nuevo Evento
-              </VvHeading>
-              <button
-                type="button"
-                onClick={() => setShowCreateModal(false)}
-                className="text-[#C4B9A5] hover:text-[#F9F6F0]"
-              >
-                ✕
-              </button>
-            </div>
+      <VvModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        title="Registrar Nuevo Evento"
+        subtitle="Ingresa la ficha del evento y cotización del cliente"
+        size="md"
+      >
+        <form onSubmit={handleCreate} className="space-y-4">
+          <VvTextInput label="Título del Evento" placeholder="Ej: Boda Gómez & Silva" value={title} onChange={setTitle} required />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <VvTextInput label="Nombre del Cliente" placeholder="Ej: Marcela Gómez" value={clientName} onChange={setClientName} required />
+            <VvTextInput label="Teléfono Cliente" placeholder="Ej: 71234567" value={clientPhone} onChange={setClientPhone} required />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <VvTextInput label="Fecha del Evento" type="date" value={eventDate} onChange={setEventDate} required />
+            <VvTextInput label="Ubicación / Salón" placeholder="Ej: Salón Las Palmeras" value={location} onChange={setLocation} required />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <VvTextInput label="Precio Total (Bs.)" type="number" value={totalPriceBs} onChange={setTotalPriceBs} required />
+            <VvTextInput label="Adelanto / Seña (Bs.)" type="number" value={advancePriceBs} onChange={setAdvancePriceBs} required />
+          </div>
+          <VvTextArea label="Notas Operativas" placeholder="Requerimientos florales, mantelería, cotillón..." value={notes} onChange={setNotes} />
 
-            <VvTextInput label="Título del Evento" placeholder="Ej: Boda Gómez & Silva" value={title} onChange={setTitle} required />
-            <div className="grid grid-cols-2 gap-3">
-              <VvTextInput label="Nombre del Cliente" placeholder="Ej: Marcela Gómez" value={clientName} onChange={setClientName} required />
-              <VvTextInput label="Teléfono Cliente" placeholder="Ej: 71234567" value={clientPhone} onChange={setClientPhone} required />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <VvTextInput label="Fecha del Evento" type="date" value={eventDate} onChange={setEventDate} required />
-              <VvTextInput label="Ubicación / Salón" placeholder="Ej: Salón Las Palmeras" value={location} onChange={setLocation} required />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <VvTextInput label="Precio Total (Bs.)" type="number" value={totalPriceBs} onChange={setTotalPriceBs} required />
-              <VvTextInput label="Adelanto / Seña (Bs.)" type="number" value={advancePriceBs} onChange={setAdvancePriceBs} required />
-            </div>
-            <VvTextArea label="Notas Operativas" placeholder="Requerimientos florales, mantelería, cotillón..." value={notes} onChange={setNotes} />
-
-            <div className="flex justify-end gap-3 pt-3 border-t border-[#D4AF37]/20">
-              <VvButton variant="ghost" size="sm" type="button" onClick={() => setShowCreateModal(false)}>
-                Cancelar
-              </VvButton>
-              <VvButton variant="gold" size="md" type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Guardando...' : 'Guardar Evento'}
-              </VvButton>
-            </div>
-          </form>
-        </div>
-      )}
+          <div className="flex justify-end gap-3 pt-3 border-t border-[#D4AF37]/20">
+            <VvButton variant="ghost" size="sm" type="button" onClick={() => setShowCreateModal(false)}>
+              Cancelar
+            </VvButton>
+            <VvButton variant="gold" size="md" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Guardando...' : 'Guardar Evento'}
+            </VvButton>
+          </div>
+        </form>
+      </VvModal>
     </div>
   )
 }

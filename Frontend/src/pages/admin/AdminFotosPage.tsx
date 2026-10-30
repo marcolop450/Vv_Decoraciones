@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { VvButton, VvHeading, VvBadge, VvCard } from '../../components/ui/VvPrimitives'
 import { VvTextInput, VvTextArea, VvImageDropzone } from '../../components/ui/VvFormControls'
+import { VvModal } from '../../components/ui/VvModal'
 import { useCatalogo } from '../../hooks/useCatalogo'
 
 export function AdminFotosPage() {
@@ -98,71 +99,59 @@ export function AdminFotosPage() {
       )}
 
       {/* Modal de Subida de Imagen Pura */}
-      {showUploadModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm vv-animate-modal">
-          <form
-            onSubmit={handleUpload}
-            className="w-full max-w-lg rounded-2xl bg-[#0E0E11] border border-[#D4AF37]/60 p-6 space-y-4"
-          >
-            <div className="flex justify-between items-center border-b border-[#D4AF37]/20 pb-3">
-              <VvHeading level={3} variant="serif" metallic>
-                Subir Fotografía Real (Imagen Pura)
-              </VvHeading>
-              <button
-                type="button"
-                onClick={() => setShowUploadModal(false)}
-                className="text-[#C4B9A5] hover:text-[#F9F6F0]"
-              >
-                ✕
-              </button>
-            </div>
+      <VvModal
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        title="Subir Fotografía Real (Imagen Pura)"
+        subtitle="Carga imágenes de alta resolución a Supabase Storage"
+        size="md"
+      >
+        <form onSubmit={handleUpload} className="space-y-4">
+          <VvImageDropzone onFileSelect={handleFileSelect} previewUrl={previewUrl} />
 
-            <VvImageDropzone onFileSelect={handleFileSelect} previewUrl={previewUrl} />
+          <VvTextInput
+            label="Título del Montaje"
+            placeholder="Ej: Mesa Presidencial Boda Gómez"
+            value={title}
+            onChange={setTitle}
+            required
+          />
 
-            <VvTextInput
-              label="Título del Montaje"
-              placeholder="Ej: Mesa Presidencial Boda Gómez"
-              value={title}
-              onChange={setTitle}
-              required
-            />
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#C4B9A5]">
+              Categoría del Evento
+            </label>
+            <select
+              value={categorySlug}
+              onChange={(e) => setCategorySlug(e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-xl bg-[#1D1D24] border border-[#D4AF37]/40 text-[#F9F6F0] text-sm focus:outline-none focus:border-[#F3D37A]"
+            >
+              {categories.map((c) => (
+                <option key={c.id} value={c.slug}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-            <div className="space-y-1.5">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#C4B9A5]">
-                Categoría del Evento
-              </label>
-              <select
-                value={categorySlug}
-                onChange={(e) => setCategorySlug(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#1D1D24] border border-[#D4AF37]/40 text-[#F9F6F0] text-sm focus:outline-none focus:border-[#F3D37A]"
-              >
-                {categories.map((c) => (
-                  <option key={c.id} value={c.slug}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <VvTextArea
+            label="Descripción o Ficha del Montaje"
+            placeholder="Candelabros dorados, flores orquídeas blancas, mantelería de terciopelo..."
+            value={description}
+            onChange={setDescription}
+            rows={2}
+          />
 
-            <VvTextArea
-              label="Descripción o Ficha del Montaje"
-              placeholder="Candelabros dorados, flores orquídeas blancas, mantelería de terciopelo..."
-              value={description}
-              onChange={setDescription}
-              rows={2}
-            />
-
-            <div className="flex justify-end gap-3 pt-3 border-t border-[#D4AF37]/20">
-              <VvButton variant="ghost" size="sm" type="button" onClick={() => setShowUploadModal(false)}>
-                Cancelar
-              </VvButton>
-              <VvButton variant="gold" size="md" type="submit" disabled={isUploading || !selectedFile}>
-                {isUploading ? 'Subiendo a Storage...' : 'Publicar Fotografía'}
-              </VvButton>
-            </div>
-          </form>
-        </div>
-      )}
+          <div className="flex justify-end gap-3 pt-3 border-t border-[#D4AF37]/20">
+            <VvButton variant="ghost" size="sm" type="button" onClick={() => setShowUploadModal(false)}>
+              Cancelar
+            </VvButton>
+            <VvButton variant="gold" size="md" type="submit" disabled={isUploading || !selectedFile}>
+              {isUploading ? 'Subiendo a Storage...' : 'Publicar Fotografía'}
+            </VvButton>
+          </div>
+        </form>
+      </VvModal>
     </div>
   )
 }
