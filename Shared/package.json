@@ -1,0 +1,7 @@
+{
+  "name": "@eventos-vero/shared",
+  "version": "1.0.0",
+  "description": "Contratos TypeScript y tokens de diseno compartidos",
+  "main": "./index.ts",
+  "types": "./index.ts"
+}

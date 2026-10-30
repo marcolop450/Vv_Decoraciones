@@ -1,0 +1,258 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Great+Vibes&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+:root {
+  /* Superficies Oscuras — Gala Nocturna */
+  --vv-bg-base: #050505;
+  --vv-bg-surface: #0e0e11;
+  --vv-bg-elevated: #16161b;
+  --vv-bg-subtle: #1d1d24;
+  --vv-bg-glass: rgba(22, 22, 27, 0.85);
+
+  /* Espectro Dorado Metálico */
+  --vv-gold-100: #fff3b0;
+  --vv-gold-200: #fae28c;
+  --vv-gold-300: #f3d37a;
+  --vv-gold-500: #d4af37;
+  --vv-gold-700: #aa7c11;
+  --vv-gold-900: #6b4c08;
+  --vv-gold-border: rgba(212, 175, 55, 0.25);
+  --vv-gold-border-strong: rgba(243, 211, 122, 0.55);
+  --vv-gold-surface: rgba(212, 175, 55, 0.1);
+  --vv-gold-gradient: linear-gradient(
+    135deg,
+    #aa7c11 0%,
+    #d4af37 30%,
+    #fff3b0 50%,
+    #d4af37 70%,
+    #8a620a 100%
+  );
+  --vv-gold-subtle-gradient: linear-gradient(
+    180deg,
+    rgba(212, 175, 55, 0.16) 0%,
+    rgba(212, 175, 55, 0.03) 100%
+  );
+
+  /* Tipografía y Contraste Neutro (WCAG AA) */
+  --vv-text-primary: #f9f6f0;
+  --vv-text-secondary: #c4b9a5;
+  --vv-text-muted: #857d6f;
+  --vv-text-on-gold: #080705;
+
+  /* Colores Semánticos */
+  --vv-success-text: #4ade80;
+  --vv-success-bg: rgba(46, 204, 113, 0.12);
+  --vv-success-border: rgba(46, 204, 113, 0.35);
+
+  --vv-warning-text: #fbbf24;
+  --vv-warning-bg: rgba(245, 176, 65, 0.12);
+  --vv-warning-border: rgba(245, 176, 65, 0.35);
+
+  --vv-danger-text: #f87171;
+  --vv-danger-bg: rgba(231, 76, 60, 0.12);
+  --vv-danger-border: rgba(231, 76, 60, 0.35);
+
+  --vv-info-text: #60a5fa;
+  --vv-info-bg: rgba(93, 173, 226, 0.12);
+  --vv-info-border: rgba(93, 173, 226, 0.35);
+
+  /* Familias Tipográficas */
+  --vv-font-script: 'Great Vibes', cursive;
+  --vv-font-serif: 'Cormorant Garamond', Georgia, serif;
+  --vv-font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --vv-font-mono: 'JetBrains Mono', monospace;
+
+  /* Radios y Sombras */
+  --vv-radius-sm: 0.375rem;
+  --vv-radius-md: 0.75rem;
+  --vv-radius-lg: 1.125rem;
+  --vv-radius-xl: 1.75rem;
+  --vv-shadow-card: 0 12px 32px -8px rgba(0, 0, 0, 0.78), 0 0 0 1px rgba(212, 175, 55, 0.18);
+  --vv-shadow-glow: 0 0 28px -4px rgba(212, 175, 55, 0.38);
+}
+
+@layer base {
+  body {
+    background-color: var(--vv-bg-base);
+    color: var(--vv-text-primary);
+    font-family: var(--vv-font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Clases de utilidad del Design System V.v */
+.vv-bg-base {
+  background-color: var(--vv-bg-base);
+}
+.vv-bg-surface {
+  background-color: var(--vv-bg-surface);
+}
+.vv-bg-elevated {
+  background-color: var(--vv-bg-elevated);
+}
+.vv-bg-subtle {
+  background-color: var(--vv-bg-subtle);
+}
+.vv-bg-glass {
+  background-color: var(--vv-bg-glass);
+  backdrop-filter: blur(16px);
+}
+.vv-bg-gold-surface {
+  background-color: var(--vv-gold-surface);
+}
+.vv-bg-gold-gradient {
+  background-image: var(--vv-gold-gradient);
+}
+.vv-bg-gold-subtle {
+  background-image: var(--vv-gold-subtle-gradient);
+}
+
+.vv-text-primary {
+  color: var(--vv-text-primary);
+}
+.vv-text-secondary {
+  color: var(--vv-text-secondary);
+}
+.vv-text-muted {
+  color: var(--vv-text-muted);
+}
+.vv-text-gold {
+  color: var(--vv-gold-500);
+}
+.vv-text-gold-light {
+  color: var(--vv-gold-100);
+}
+.vv-text-on-gold {
+  color: var(--vv-text-on-gold);
+}
+
+.vv-text-gold-metallic {
+  background-image: var(--vv-gold-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.vv-border-gold {
+  border-color: var(--vv-gold-border);
+}
+.vv-border-gold-strong {
+  border-color: var(--vv-gold-border-strong);
+}
+
+.vv-shadow-card {
+  box-shadow: var(--vv-shadow-card);
+}
+.vv-shadow-glow {
+  box-shadow: var(--vv-shadow-glow);
+}
+
+.vv-font-script {
+  font-family: var(--vv-font-script);
+}
+.vv-font-serif {
+  font-family: var(--vv-font-serif);
+}
+.vv-font-sans {
+  font-family: var(--vv-font-sans);
+}
+.vv-font-mono {
+  font-family: var(--vv-font-mono);
+}
+
+.vv-badge-success {
+  color: var(--vv-success-text);
+  background-color: var(--vv-success-bg);
+  border: 1px solid var(--vv-success-border);
+}
+.vv-badge-warning {
+  color: var(--vv-warning-text);
+  background-color: var(--vv-warning-bg);
+  border: 1px solid var(--vv-warning-border);
+}
+.vv-badge-danger {
+  color: var(--vv-danger-text);
+  background-color: var(--vv-danger-bg);
+  border: 1px solid var(--vv-danger-border);
+}
+.vv-badge-info {
+  color: var(--vv-info-text);
+  background-color: var(--vv-info-bg);
+  border: 1px solid var(--vv-info-border);
+}
+.vv-badge-gold {
+  color: var(--vv-gold-100);
+  background-color: var(--vv-gold-surface);
+  border: 1px solid var(--vv-gold-border-strong);
+}
+
+/* Animaciones fluidas Gala Nocturna */
+@keyframes vvFadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes vvScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes vvPulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 22px -4px rgba(212, 175, 55, 0.32);
+  }
+  50% {
+    box-shadow: 0 0 34px 0px rgba(243, 211, 122, 0.52);
+  }
+}
+
+@keyframes vvShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.vv-animate-page {
+  animation: vvFadeSlideUp 0.36s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.vv-animate-card {
+  animation: vvFadeSlideUp 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition:
+    transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.24s ease,
+    box-shadow 0.24s ease;
+}
+
+.vv-animate-card:hover {
+  transform: translateY(-3px);
+}
+
+.vv-animate-modal {
+  animation: vvScaleIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.vv-pulse-glow {
+  animation: vvPulseGlow 3.2s infinite ease-in-out;
+}
+
+.vv-shimmer {
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.1) 0%, rgba(255, 243, 176, 0.35) 50%, rgba(212, 175, 55, 0.1) 100%);
+  background-size: 200% 100%;
+  animation: vvShimmer 3.5s infinite;
+}

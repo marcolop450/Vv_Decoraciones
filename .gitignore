@@ -1,0 +1,34 @@
+# Environment & Secrets (NEVER COMMIT CREDENTIALS)
+.env
+.env.*
+*.env
+*.env.local
+
+# MCP Local Configurations with credentials
+mcp_config.json
+.mcp.json
+.agent/mcp.json
+.gemini/mcp_config.json
+
+# Binaries & Executables
+*.exe
+*.dll
+*.bin
+
+# Legacy / Prototype Demo
+Modelo de Frontend y Movil/
+
+# Dependencies & Build Outputs
+node_modules/
+dist/
+build/
+out/
+.expo/
+.next/
+test-results/
+Frontend/test-results/
+playwright-report/
+
+# System files
+.DS_Store
+Thumbs.db
