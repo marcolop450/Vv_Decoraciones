@@ -24,7 +24,6 @@ export function AdminFotosPage() {
     deletePhoto,
     getCategoryName,
     isMobileView,
-    deviceMode,
   } = useVvApp()
 
   const [modalOpen, setModalOpen] = useState(false)
@@ -105,61 +104,94 @@ export function AdminFotosPage() {
         </div>
       )}
 
-      {/* Grilla de Fotos Publicadas */}
-      <div
-        className={`grid grid-cols-1 ${
-          isMobileView ? 'gap-5' : 'sm:grid-cols-2 lg:grid-cols-3 gap-6'
-        }`}
-      >
-        {state.photos.map((photo) => (
-          <VvCard
-            key={photo.id}
-            variant="surface"
-            className="overflow-hidden flex flex-col justify-between"
-          >
-            <div>
-              <div className="relative h-52 overflow-hidden">
-                <img
-                  src={photo.imageUrl}
-                  alt={photo.name}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute top-3 left-3">
-                  <VvBadge variant="gold">
-                    {getCategoryName(photo.categoryId)}
-                  </VvBadge>
+      {/* Grilla de Fotos Publicadas o Estado Vacío */}
+      {state.photos.length === 0 ? (
+        <VvCard
+          variant="surface"
+          className="p-10 sm:p-14 text-center space-y-4 max-w-xl mx-auto"
+        >
+          <div className="w-16 h-16 rounded-2xl vv-bg-elevated border vv-border-gold flex items-center justify-center mx-auto text-amber-400">
+            <svg
+              className="w-8 h-8"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <rect x="3" y="4" width="18" height="16" rx="2" />
+              <circle cx="8.5" cy="9.5" r="1.5" />
+              <path d="M21 15l-5-5L5 20" />
+            </svg>
+          </div>
+          <VvHeading level={3} variant="serif">
+            Aún no hay fotos en el catálogo
+          </VvHeading>
+          <p className="text-xs sm:text-sm vv-text-secondary leading-relaxed">
+            Registra tu primera fotografía para mostrarla en la página principal y
+            en el catálogo público de clientes.
+          </p>
+          <div>
+            <VvButton size="md" variant="gold" onClick={openCreateModal}>
+              + Registrar Primera Foto
+            </VvButton>
+          </div>
+        </VvCard>
+      ) : (
+        <div
+          className={`grid grid-cols-1 ${
+            isMobileView ? 'gap-5' : 'sm:grid-cols-2 lg:grid-cols-3 gap-6'
+          }`}
+        >
+          {state.photos.map((photo) => (
+            <VvCard
+              key={photo.id}
+              variant="surface"
+              className="overflow-hidden flex flex-col justify-between"
+            >
+              <div>
+                <div className="relative h-52 overflow-hidden">
+                  <img
+                    src={photo.imageUrl}
+                    alt={photo.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-3 left-3">
+                    <VvBadge variant="gold">
+                      {getCategoryName(photo.categoryId)}
+                    </VvBadge>
+                  </div>
+                </div>
+
+                <div className="p-5 space-y-2">
+                  <VvHeading level={4} variant="serif">
+                    {photo.name}
+                  </VvHeading>
+                  <p className="text-xs vv-text-secondary leading-relaxed">
+                    {photo.description}
+                  </p>
                 </div>
               </div>
 
-              <div className="p-5 space-y-2">
-                <VvHeading level={4} variant="serif">
-                  {photo.name}
-                </VvHeading>
-                <p className="text-xs vv-text-secondary leading-relaxed">
-                  {photo.description}
-                </p>
+              <div className="p-4 pt-3 border-t vv-border-gold flex items-center justify-end gap-2">
+                <VvButton
+                  size="sm"
+                  variant="outline"
+                  onClick={() => openEditModal(photo)}
+                >
+                  Editar
+                </VvButton>
+                <VvButton
+                  size="sm"
+                  variant="danger"
+                  onClick={() => handleDelete(photo)}
+                >
+                  Eliminar
+                </VvButton>
               </div>
-            </div>
-
-            <div className="p-4 pt-3 border-t vv-border-gold flex items-center justify-end gap-2">
-              <VvButton
-                size="sm"
-                variant="outline"
-                onClick={() => openEditModal(photo)}
-              >
-                Editar
-              </VvButton>
-              <VvButton
-                size="sm"
-                variant="danger"
-                onClick={() => handleDelete(photo)}
-              >
-                Eliminar
-              </VvButton>
-            </div>
-          </VvCard>
-        ))}
-      </div>
+            </VvCard>
+          ))}
+        </div>
+      )}
 
       {/* MODAL PARA REGISTRAR / EDITAR FOTO */}
       {modalOpen && (
@@ -167,9 +199,7 @@ export function AdminFotosPage() {
           role="dialog"
           aria-modal="true"
           aria-label="Registrar o Editar Foto del Catálogo"
-          className={`${
-            deviceMode === 'mobile' ? 'absolute' : 'fixed'
-          } inset-0 z-50 flex items-center justify-center p-3 sm:p-4 vv-bg-glass overflow-y-auto`}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 vv-bg-glass overflow-y-auto"
         >
           <VvCard
             variant="gold-highlight"

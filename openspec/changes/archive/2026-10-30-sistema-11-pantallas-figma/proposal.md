@@ -1,8 +1,9 @@
 # Propuesta: Sistema Completo de 11 Pantallas Figma y Enrutamiento Real
 
-## 1. Contexto y Diagnóstico
-Actualmente la aplicación en `Frontend/` se ejecuta bajo una navegación basada en estado interno que mantiene la URL fija en `localhost:3000/`. Además, solo cuenta con 4 páginas básicas, mientras que el diseño oficial entregado por Figma en `D:\Eventos_Vero\Modelo de Frontend y Movil` define una suite completa de **11 pantallas discretas**, soporte dual Desktop / Vista Móvil (con barra inferior fija y marco de teléfono) y 8 reglas de negocio fundamentales:
+## Why
+Actualmente la aplicación en `Frontend/` se ejecutaba bajo una navegación basada en estado interno que mantenía la URL fija en `localhost:3000/`. Además, solo contaba con páginas básicas sin la arquitectura modular de 11 pantallas requerida por Figma, afectando la usabilidad, la trazabilidad y la navegación directa del cliente y del dueño.
 
+## What Changes
 1. **Enrutamiento Real en Navegador**: Rutas visibles e independientes para cada pantalla (`/landing`, `/catalogo`, `/login`, `/admin/inicio`, `/admin/fotos`, `/admin/eventos`, `/admin/eventos/nuevo`, `/admin/eventos/detalle`, `/admin/calendario`, `/admin/reportes`, `/admin/bitacora`) con soporte para historial (`pushState` y `popstate`).
 2. **Vista Cliente (Pública)**:
    - `/landing`: Hero con llamada a la acción, botón de alternancia "Ver en Móvil / Volver a Web", muestra aleatoria de 3 decoraciones con botón para refrescar selección, y tarjetas con botón "Cotizar por WhatsApp".

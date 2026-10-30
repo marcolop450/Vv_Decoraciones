@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 import vvLogo from '../../assets/vv-logo.png'
 import { useVvApp } from '../../context/VvAppContext'
 import type { AppRoute } from '../../types/vv-app'
@@ -98,22 +98,9 @@ export function AdminLayout({
   headerActions?: React.ReactNode
   children: React.ReactNode
 }) {
-  const {
-    currentRoute,
-    navigate,
-    logoutOwner,
-    deviceMode,
-    toggleDeviceMode,
-  } = useVvApp()
+  const { currentRoute, navigate, logoutOwner } = useVvApp()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [configModalOpen, setConfigModalOpen] = useState(false)
-  const phoneScrollRef = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    if (phoneScrollRef.current) {
-      phoneScrollRef.current.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-  }, [currentRoute])
 
   const isRouteActive = (itemRoute: AppRoute) => {
     if (
@@ -127,196 +114,10 @@ export function AdminLayout({
     return currentRoute === itemRoute
   }
 
-  // VISTA MÓVIL DEDICADA (APARTE DE LA WEB)
-  if (deviceMode === 'mobile') {
-    return (
-      <div className="h-screen overflow-hidden vv-bg-base vv-text-primary py-3 px-3 flex flex-col items-center justify-center">
-        {/* Barra de cambio a Vista Web fuera del dispositivo */}
-        <div className="w-full max-w-sm mb-2.5 flex items-center justify-between gap-2 px-4 py-2 rounded-2xl vv-bg-surface border vv-border-gold vv-shadow-card shrink-0">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-amber-400" />
-            <span className="text-xs font-medium vv-text-secondary">
-              App Móvil Dueño
-            </span>
-          </div>
-          <VvButton size="sm" variant="gold" onClick={toggleDeviceMode}>
-            <svg
-              className="w-4 h-4 shrink-0"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <rect x="2" y="3" width="20" height="14" rx="2" />
-              <line x1="8" y1="21" x2="16" y2="21" />
-              <line x1="12" y1="17" x2="12" y2="21" />
-            </svg>
-            <span>Volver a Web</span>
-          </VvButton>
-        </div>
-
-        {/* Chasis del Dispositivo Móvil con Altura Real Fija y Scroll Interno */}
-        <div className="vv-phone-frame rounded-3xl vv-bg-base border-2 vv-border-gold-strong vv-shadow-glow">
-          {/* Barra de estado del teléfono */}
-          <div className="px-5 py-1.5 vv-bg-base flex items-center justify-between text-xs vv-text-muted shrink-0">
-            <span className="vv-font-mono">09:41</span>
-            <div className="w-16 h-3 rounded-full vv-bg-elevated border vv-border-gold" />
-            <span className="vv-text-gold-light font-medium">5G</span>
-          </div>
-
-          {/* Topbar Móvil Minimalista */}
-          <header className="z-20 vv-bg-glass border-b vv-border-gold px-4 py-3 flex items-center justify-between gap-2 shrink-0">
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={() => navigate('/admin/inicio')}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault()
-                  navigate('/admin/inicio')
-                }
-              }}
-              className="flex items-center gap-2.5 cursor-pointer min-w-0"
-            >
-              <img
-                src={vvLogo}
-                alt="Logo V.v"
-                className="w-9 h-9 rounded-xl object-contain border vv-border-gold-strong vv-bg-base shrink-0"
-              />
-              <div className="min-w-0">
-                <div className="vv-font-serif font-bold text-base vv-text-gold-metallic leading-tight truncate">
-                  {title}
-                </div>
-              </div>
-            </div>
-
-            <VvButton
-              size="sm"
-              variant="subtle"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? '✕' : '☰ Más'}
-            </VvButton>
-          </header>
-
-          {/* Menú desplegable móvil */}
-          {mobileMenuOpen && (
-            <div className="absolute top-[88px] inset-x-3 z-40 p-4 rounded-2xl vv-bg-surface border vv-border-gold-strong vv-shadow-glow space-y-2 vv-animate-modal">
-              <div className="text-xs font-semibold uppercase tracking-wider vv-text-gold-light pb-1 border-b vv-border-gold">
-                Módulos del Sistema
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  navigate('/admin/bitacora')
-                  setMobileMenuOpen(false)
-                }}
-                className="w-full flex items-center gap-2.5 p-2 rounded-xl text-xs vv-text-primary hover:vv-bg-subtle text-left"
-              >
-                <svg className="w-4 h-4 vv-text-gold shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                  <polyline points="14 2 14 8 20 8" />
-                </svg>
-                <span>Bitácora de Auditoría</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  navigate('/landing')
-                  setMobileMenuOpen(false)
-                }}
-                className="w-full flex items-center gap-2.5 p-2 rounded-xl text-xs vv-text-secondary hover:vv-bg-subtle text-left"
-              >
-                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="2" y1="12" x2="22" y2="12" />
-                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                </svg>
-                <span>Ver Sitio Web Público</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setConfigModalOpen(true)
-                  setMobileMenuOpen(false)
-                }}
-                className="w-full flex items-center gap-2.5 p-2 rounded-xl text-xs vv-text-gold-light hover:vv-bg-subtle text-left"
-              >
-                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="3" />
-                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                </svg>
-                <span>Variables de Negocio & Teléfonos</span>
-              </button>
-              <div className="pt-2 border-t vv-border-gold">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMobileMenuOpen(false)
-                    logoutOwner()
-                  }}
-                  className="w-full p-2 rounded-xl text-xs text-red-400 hover:bg-red-500/10 text-left font-medium"
-                >
-                  Cerrar Sesión del Dueño
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Área de scroll interno */}
-          <div ref={phoneScrollRef} className="vv-phone-scroll p-4 space-y-4">
-            <div key={`${currentRoute}-mobile`} className="vv-animate-page">
-              {children}
-            </div>
-          </div>
-
-          {/* Barra inferior fija de navegación */}
-          <nav
-            aria-label="Navegación Móvil del Administrador"
-            className="z-30 vv-bg-glass border-t vv-border-gold px-2 py-1.5 grid grid-cols-5 gap-1 shrink-0"
-          >
-            {MOBILE_BOTTOM_NAV_ITEMS.map((item) => {
-              const active = isRouteActive(item.route)
-              return (
-                <button
-                  key={item.route}
-                  type="button"
-                  onClick={() => {
-                    setMobileMenuOpen(false)
-                    navigate(item.route)
-                  }}
-                  className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all ${
-                    active
-                      ? 'vv-text-gold-light font-bold bg-amber-400/10'
-                      : 'vv-text-muted hover:vv-text-secondary'
-                  }`}
-                >
-                  <span className={active ? 'vv-text-gold' : 'currentColor'}>
-                    {item.icon}
-                  </span>
-                  <span className="text-[10px] mt-1 leading-none truncate max-w-full">
-                    {item.shortLabel}
-                  </span>
-                </button>
-              )
-            })}
-          </nav>
-        </div>
-
-        <BusinessConfigModal
-          isOpen={configModalOpen}
-          onClose={() => setConfigModalOpen(false)}
-          insidePhoneFrame
-        />
-      </div>
-    )
-  }
-
-  // VISTA WEB DESKTOP
   return (
-    <div className="min-h-screen vv-bg-base vv-text-primary flex">
-      {/* Sidebar de escritorio */}
-      <aside className="w-64 vv-bg-surface border-r vv-border-gold flex flex-col shrink-0">
+    <div className="min-h-screen vv-bg-base vv-text-primary flex flex-col md:flex-row">
+      {/* Sidebar de escritorio (visible solo en >= 768px) */}
+      <aside className="hidden md:flex md:w-64 vv-bg-surface border-r vv-border-gold flex-col shrink-0 sticky top-0 h-screen">
         <div className="p-6 border-b vv-border-gold">
           <div
             role="button"
@@ -372,25 +173,6 @@ export function AdminLayout({
             size="sm"
             variant="outline"
             className="w-full justify-start gap-2"
-            onClick={toggleDeviceMode}
-          >
-            <svg
-              className="w-4 h-4 shrink-0"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <rect x="6" y="2" width="12" height="20" rx="2.5" />
-              <line x1="11" y1="18" x2="13" y2="18" />
-            </svg>
-            <span>Ver Modo Móvil</span>
-          </VvButton>
-
-          <VvButton
-            size="sm"
-            variant="outline"
-            className="w-full justify-start gap-2"
             onClick={() => setConfigModalOpen(true)}
           >
             <svg
@@ -425,9 +207,112 @@ export function AdminLayout({
         </div>
       </aside>
 
-      {/* Contenido principal de escritorio */}
+      {/* Header móvil nativo (visible solo en < 768px) */}
+      <header className="md:hidden sticky top-0 z-30 vv-bg-glass border-b vv-border-gold px-4 py-3 flex items-center justify-between gap-2">
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => navigate('/admin/inicio')}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              navigate('/admin/inicio')
+            }
+          }}
+          className="flex items-center gap-2.5 cursor-pointer min-w-0"
+        >
+          <img
+            src={vvLogo}
+            alt="Logo V.v"
+            className="w-8 h-8 rounded-xl object-contain border vv-border-gold-strong vv-bg-base shrink-0"
+          />
+          <div className="min-w-0">
+            <div className="vv-font-serif font-bold text-base vv-text-gold-metallic leading-tight truncate">
+              {title}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {headerActions}
+          <VvButton
+            size="sm"
+            variant="subtle"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? '✕' : '☰ Más'}
+          </VvButton>
+        </div>
+      </header>
+
+      {/* Menú desplegable móvil */}
+      {mobileMenuOpen && (
+        <div className="md:hidden fixed top-[57px] inset-x-3 z-40 p-4 rounded-2xl vv-bg-surface border vv-border-gold-strong vv-shadow-glow space-y-2 vv-animate-modal">
+          <div className="text-xs font-semibold uppercase tracking-wider vv-text-gold-light pb-1 border-b vv-border-gold">
+            Módulos del Sistema
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              navigate('/admin/bitacora')
+              setMobileMenuOpen(false)
+            }}
+            className="w-full flex items-center gap-2.5 p-2 rounded-xl text-xs vv-text-primary hover:vv-bg-subtle text-left"
+          >
+            <svg className="w-4 h-4 vv-text-gold shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            <span>Bitácora de Auditoría</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              navigate('/landing')
+              setMobileMenuOpen(false)
+            }}
+            className="w-full flex items-center gap-2.5 p-2 rounded-xl text-xs vv-text-secondary hover:vv-bg-subtle text-left"
+          >
+            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="2" y1="12" x2="22" y2="12" />
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            </svg>
+            <span>Ver Sitio Web Público</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setConfigModalOpen(true)
+              setMobileMenuOpen(false)
+            }}
+            className="w-full flex items-center gap-2.5 p-2 rounded-xl text-xs vv-text-gold-light hover:vv-bg-subtle text-left"
+          >
+            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+            <span>Variables de Negocio & Teléfonos</span>
+          </button>
+          <div className="pt-2 border-t vv-border-gold">
+            <button
+              type="button"
+              onClick={() => {
+                setMobileMenuOpen(false)
+                logoutOwner()
+              }}
+              className="w-full p-2 rounded-xl text-xs text-red-400 hover:bg-red-500/10 text-left font-medium"
+            >
+              Cerrar Sesión del Dueño
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Contenido principal */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="sticky top-0 z-20 vv-bg-glass border-b vv-border-gold px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+        {/* Header escritorio (solo visible en >= 768px) */}
+        <header className="hidden md:flex sticky top-0 z-20 vv-bg-glass border-b vv-border-gold px-6 py-4 items-center justify-between gap-4">
           <div>
             <VvHeading level={2} variant="serif" metallic>
               {title}
@@ -441,10 +326,46 @@ export function AdminLayout({
           )}
         </header>
 
-        <main key={`${currentRoute}-desktop`} className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto vv-animate-page">
+        {/* Cuerpo de página */}
+        <main
+          key={currentRoute}
+          className="flex-1 p-4 sm:p-6 md:p-8 pb-24 md:pb-8 max-w-7xl w-full mx-auto vv-animate-page"
+        >
           {children}
         </main>
       </div>
+
+      {/* Barra inferior de navegación nativa para Móviles (<= 768px) */}
+      <nav
+        aria-label="Navegación Móvil del Administrador"
+        className="md:hidden fixed bottom-0 inset-x-0 z-30 vv-bg-surface/95 backdrop-blur-md border-t vv-border-gold px-2 py-2 grid grid-cols-5 gap-1 shadow-lg"
+      >
+        {MOBILE_BOTTOM_NAV_ITEMS.map((item) => {
+          const active = isRouteActive(item.route)
+          return (
+            <button
+              key={item.route}
+              type="button"
+              onClick={() => {
+                setMobileMenuOpen(false)
+                navigate(item.route)
+              }}
+              className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all ${
+                active
+                  ? 'vv-text-gold-light font-bold bg-amber-400/10'
+                  : 'vv-text-muted hover:vv-text-secondary'
+              }`}
+            >
+              <span className={active ? 'vv-text-gold' : 'currentColor'}>
+                {item.icon}
+              </span>
+              <span className="text-[10px] mt-1 leading-none truncate max-w-full">
+                {item.shortLabel}
+              </span>
+            </button>
+          )
+        })}
+      </nav>
 
       <BusinessConfigModal
         isOpen={configModalOpen}

@@ -1,29 +1,29 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('Flujo de Catálogo y Cotizador V.v', () => {
-  test('La landing page carga el título oficial y permite abrir el cotizador de WhatsApp', async ({ page }) => {
+  test('La landing page carga el título oficial y permite explorar el catálogo', async ({ page }) => {
     await page.goto('/')
 
     // Verificar presencia del encabezado de marca
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
 
-    // Abrir modal de cotización
-    const quoteButton = page.getByRole('button', { name: /Cotizar mi Celebración/i })
-    await expect(quoteButton).toBeVisible()
-    await quoteButton.click()
+    // Navegar a Catálogo
+    const catalogButton = page.getByRole('button', { name: /Explorar Catálogo de Decoraciones/i })
+    await expect(catalogButton).toBeVisible()
+    await catalogButton.click()
 
-    // Verificar que el modal interactivo esté visible
-    await expect(page.getByRole('heading', { name: /Solicitar Cotización de Gala/i })).toBeVisible()
-    await expect(page.getByPlaceholder(/Ej: Verónica Méndez/i)).toBeVisible()
+    // Validar llegada a /catalogo
+    await expect(page).toHaveURL(/.*\/catalogo/)
+    await expect(page.getByPlaceholder(/Buscar decoración por nombre/i)).toBeVisible()
   })
 
-  test('Navegación al catálogo de decoraciones', async ({ page }) => {
+  test('Navegación directa al catálogo de decoraciones desde Navbar', async ({ page }) => {
     await page.goto('/')
 
-    const catalogLink = page.getByRole('button', { name: /Catálogo de Galas/i })
-    await catalogLink.click()
+    const navCatalogLink = page.getByRole('button', { name: /Ver Decoraciones/i }).first()
+    await navCatalogLink.click()
 
-    await expect(page.getByRole('heading', { name: /Catálogo de Decoraciones/i })).toBeVisible()
-    await expect(page.getByRole('button', { name: /Todos/i })).toBeVisible()
+    await expect(page).toHaveURL(/.*\/catalogo/)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   })
 })

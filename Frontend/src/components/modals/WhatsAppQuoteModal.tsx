@@ -12,11 +12,7 @@ import {
   VvHeading,
 } from '../ui/VvPrimitives'
 
-export function WhatsAppQuoteModal({
-  insidePhoneFrame = false,
-}: {
-  insidePhoneFrame?: boolean
-}) {
+export function WhatsAppQuoteModal() {
   const { quotePhoto, closeWhatsAppQuote, getCategoryName, state } = useVvApp()
   const todayIso = useMemo(() => getLocalIsoDate(0), [])
   const [selectedDate, setSelectedDate] = useState<string>('')
@@ -87,9 +83,7 @@ export function WhatsAppQuoteModal({
       role="dialog"
       aria-modal="true"
       aria-label="Cotizar Decoración por WhatsApp"
-      className={`${
-        insidePhoneFrame ? 'absolute' : 'fixed'
-      } inset-0 z-50 flex items-center justify-center p-3 sm:p-4 vv-bg-glass overflow-y-auto`}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 vv-bg-glass overflow-y-auto"
     >
       <VvCard
         variant="gold-highlight"

@@ -11,11 +11,9 @@ import {
 export function BusinessConfigModal({
   isOpen,
   onClose,
-  insidePhoneFrame = false,
 }: {
   isOpen: boolean
   onClose: () => void
-  insidePhoneFrame?: boolean
 }) {
   const { state, updateBusinessConfig } = useVvApp()
   const [whatsappPhone, setWhatsappPhone] = useState(
@@ -62,9 +60,7 @@ export function BusinessConfigModal({
       role="dialog"
       aria-modal="true"
       aria-label="Variables de Negocio y Teléfonos"
-      className={`${
-        insidePhoneFrame ? 'absolute' : 'fixed'
-      } inset-0 z-50 flex items-center justify-center p-3 sm:p-4 vv-bg-glass overflow-y-auto`}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 vv-bg-glass overflow-y-auto"
     >
       <VvCard
         variant="gold-highlight"

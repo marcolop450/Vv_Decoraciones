@@ -24,7 +24,7 @@ export function PublishEventPhotoModal({
   onClose: () => void
   onPublished: () => void
 }) {
-  const { addPhoto, deviceMode } = useVvApp()
+  const { addPhoto } = useVvApp()
   const [photoName, setPhotoName] = useState(event.name)
   const [description, setDescription] = useState(
     `Decoración realizada en ${event.venue} para nuestro cliente ${event.clientName}. Montaje completo con iluminación cálida y detalles en dorado imperial.`
@@ -49,9 +49,7 @@ export function PublishEventPhotoModal({
       role="dialog"
       aria-modal="true"
       aria-label="Registrar Foto del Evento Completado"
-      className={`${
-        deviceMode === 'mobile' ? 'absolute' : 'fixed'
-      } inset-0 z-50 flex items-center justify-center p-3 sm:p-4 vv-bg-glass overflow-y-auto`}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 vv-bg-glass overflow-y-auto"
     >
       <VvCard
         variant="gold-highlight"

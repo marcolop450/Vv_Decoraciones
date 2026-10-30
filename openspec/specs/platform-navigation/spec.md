@@ -1,4 +1,4 @@
-# platform-navigation Delta Specification
+# platform-navigation Specification
 
 ## Purpose
 Establece las reglas de enrutamiento real, división modular de las 11 pantallas de Figma y las 8 reglas de negocio operativas entre el rol Cliente y el rol Administrador de V.v Eventos.

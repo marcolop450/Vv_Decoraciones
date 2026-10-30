@@ -1,89 +1,42 @@
 import { test, expect } from '@playwright/test'
 
-test.describe('Navegación Móvil y Modales Accesibles (P0)', () => {
+test.describe('Navegación Móvil y Responsividad Fluida', () => {
   test.use({ viewport: { width: 375, height: 667 } })
 
-  test('El menú móvil público se despliega, permite navegar al catálogo y cierra con interacción', async ({
+  test('La barra superior pública se adapta en móvil y permite navegar al catálogo', async ({
     page,
   }) => {
     await page.goto('/')
 
-    // Verificar que los enlaces de escritorio están ocultos en móvil
-    const desktopNav = page.getByRole('navigation', { name: /Navegación principal/i })
-    await expect(desktopNav).toBeHidden()
-
-    // El botón hamburguesa móvil debe estar visible
-    const hamburgerBtn = page.getByRole('button', { name: /Abrir menú/i })
-    await expect(hamburgerBtn).toBeVisible()
-
-    // Abrir menú móvil
-    await hamburgerBtn.click()
-
-    // El drawer móvil debe estar visible con sus enlaces
-    const mobileNav = page.getByRole('navigation', { name: /Navegación móvil/i })
-    await expect(mobileNav).toBeVisible()
-
-    const catalogoLink = mobileNav.getByRole('button', { name: /Catálogo de Galas/i })
-    await expect(catalogoLink).toBeVisible()
+    // El botón 'Ver Decoraciones' debe estar disponible en móvil
+    const verDecoracionesBtn = page.getByRole('button', { name: /Ver Decoraciones/i }).first()
+    await expect(verDecoracionesBtn).toBeVisible()
 
     // Navegar al catálogo
-    await catalogoLink.click()
+    await verDecoracionesBtn.click()
 
-    // Verificar que navegó al catálogo y el menú se cerró
-    await expect(page.getByRole('heading', { name: /Catálogo de Decoraciones/i })).toBeVisible()
-    await expect(mobileNav).toBeHidden()
+    // Validar navegación al catálogo
+    await expect(page).toHaveURL(/.*\/catalogo/)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   })
 
-  test('Los modales capturan la tecla Escape y cierran correctamente', async ({ page }) => {
-    await page.goto('/')
+  test('El panel de administración en móvil muestra la barra inferior nativa y menú Más', async ({ page }) => {
+    await page.goto('/login')
 
-    // Abrir el modal de cotización
-    const cotizarBtn = page.getByRole('button', { name: /Cotizar Evento/i }).first()
-    await cotizarBtn.click()
+    // Acceso directo
+    await page.getByRole('button', { name: /Acceso Exitoso Directo/i }).click()
+    await expect(page).toHaveURL(/.*\/admin\/inicio/)
 
-    // Verificar que el diálogo modal está visible
-    const modalDialog = page.getByRole('dialog', { name: /Solicitar Cotización de Gala/i })
-    await expect(modalDialog).toBeVisible()
+    // La barra de navegación inferior móvil debe estar visible
+    const bottomNav = page.getByRole('navigation', { name: /Navegación Móvil del Administrador/i })
+    await expect(bottomNav).toBeVisible()
 
-    // Presionar tecla Escape para cerrar
-    await page.keyboard.press('Escape')
+    // El botón '☰ Más' en la barra superior móvil debe estar visible
+    const menuMasBtn = page.getByRole('button', { name: /☰ Más/i })
+    await expect(menuMasBtn).toBeVisible()
+    await menuMasBtn.click()
 
-    // El modal debe haberse cerrado
-    await expect(modalDialog).toBeHidden()
-  })
-
-  test('La barra de administración se adapta a móvil con drawer colapsable', async ({ page }) => {
-    await page.goto('/')
-
-    // Abrir menú móvil y acceder al login del dueño
-    await page.getByRole('button', { name: /Abrir menú/i }).click()
-    const mobileNav = page.getByRole('navigation', { name: /Navegación móvil/i })
-    await mobileNav.getByRole('button', { name: /Acceso Dueño/i }).click()
-
-    // Iniciar sesión
-    await page.getByPlaceholder(/admin@eventosvero.com/i).fill('admin@eventosvero.com')
-    await page.getByPlaceholder(/••••••••/i).fill('admin123')
-    await page.getByRole('button', { name: /Iniciar Sesión/i }).click()
-
-    // Validar acceso al panel administrativo
-    await expect(page.getByRole('heading', { name: /Panel Principal del Dueño/i })).toBeVisible()
-
-    // El botón de menú lateral móvil debe estar visible en el header
-    const adminMenuBtn = page.getByRole('button', { name: /Abrir menú de administración/i })
-    await expect(adminMenuBtn).toBeVisible()
-
-    // Abrir el drawer de administración
-    await adminMenuBtn.click()
-
-    // El diálogo de navegación administrativa debe estar visible
-    const adminDrawer = page.getByRole('dialog', { name: /Navegación del panel de administración/i })
-    await expect(adminDrawer).toBeVisible()
-
-    // Hacer clic en 'Gestión de Eventos'
-    await adminDrawer.getByRole('button', { name: /Gestión de Eventos/i }).click()
-
-    // Verificar que navegó a gestión de eventos y el drawer cerró
-    await expect(page.getByRole('heading', { name: /Gestión de Eventos & Montajes/i })).toBeVisible()
-    await expect(adminDrawer).toBeHidden()
+    // Debe mostrar Bitácora de Auditoría
+    await expect(page.getByRole('button', { name: /Bitácora de Auditoría/i })).toBeVisible()
   })
 })

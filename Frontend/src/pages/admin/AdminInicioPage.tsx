@@ -145,34 +145,51 @@ export function AdminInicioPage() {
             </div>
 
             <div className="space-y-2.5">
-              {activeEvents.map((ev) => {
-                const pending = Math.max(0, ev.totalPriceBs - ev.advancePriceBs)
-                return (
-                  <VvCard
-                    key={ev.id}
-                    variant="surface"
+              {activeEvents.length === 0 ? (
+                <div className="p-4 rounded-xl vv-bg-surface border vv-border-gold text-center space-y-2">
+                  <p className="text-xs vv-text-secondary">
+                    No hay eventos activos programados en este momento.
+                  </p>
+                  <VvButton
+                    size="sm"
+                    variant="gold"
                     onClick={() =>
-                      navigate('/admin/eventos/detalle', { eventId: ev.id })
+                      navigate('/admin/eventos/nuevo', { editEventId: null })
                     }
-                    className="p-3.5 flex items-center justify-between gap-3"
                   >
-                    <div className="min-w-0 space-y-0.5">
-                      <div className="font-semibold text-sm vv-text-primary truncate">
-                        {ev.name}
+                    + Registrar Evento
+                  </VvButton>
+                </div>
+              ) : (
+                activeEvents.map((ev) => {
+                  const pending = Math.max(0, ev.totalPriceBs - ev.advancePriceBs)
+                  return (
+                    <VvCard
+                      key={ev.id}
+                      variant="surface"
+                      onClick={() =>
+                        navigate('/admin/eventos/detalle', { eventId: ev.id })
+                      }
+                      className="p-3.5 flex items-center justify-between gap-3"
+                    >
+                      <div className="min-w-0 space-y-0.5">
+                        <div className="font-semibold text-sm vv-text-primary truncate">
+                          {ev.name}
+                        </div>
+                        <div className="text-xs vv-text-secondary truncate">
+                          {ev.clientName} · {formatReadableDate(ev.date)}
+                        </div>
                       </div>
-                      <div className="text-xs vv-text-secondary truncate">
-                        {ev.clientName} · {formatReadableDate(ev.date)}
+                      <div className="text-right shrink-0">
+                        <div className="vv-font-mono text-xs font-bold vv-text-gold-light">
+                          Bs. {pending.toLocaleString()}
+                        </div>
+                        <div className="text-xs vv-text-muted">por cobrar</div>
                       </div>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <div className="vv-font-mono text-xs font-bold vv-text-gold-light">
-                        Bs. {pending.toLocaleString()}
-                      </div>
-                      <div className="text-xs vv-text-muted">por cobrar</div>
-                    </div>
-                  </VvCard>
-                )
-              })}
+                    </VvCard>
+                  )
+                })
+              )}
             </div>
           </div>
         </div>
@@ -279,59 +296,78 @@ export function AdminInicioPage() {
             </div>
 
             <div className="space-y-3.5">
-              {activeEvents.map((ev) => {
-                const pending = Math.max(0, ev.totalPriceBs - ev.advancePriceBs)
-                return (
-                  <div
-                    key={ev.id}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() =>
-                      navigate('/admin/eventos/detalle', { eventId: ev.id })
-                    }
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault()
+              {activeEvents.length === 0 ? (
+                <div className="p-8 rounded-xl vv-bg-surface border vv-border-gold text-center space-y-3">
+                  <p className="text-sm vv-text-secondary">
+                    No tienes eventos activos programados para los próximos días.
+                  </p>
+                  <div>
+                    <VvButton
+                      size="sm"
+                      variant="gold"
+                      onClick={() =>
+                        navigate('/admin/eventos/nuevo', { editEventId: null })
+                      }
+                    >
+                      + Registrar Primer Evento
+                    </VvButton>
+                  </div>
+                </div>
+              ) : (
+                activeEvents.map((ev) => {
+                  const pending = Math.max(0, ev.totalPriceBs - ev.advancePriceBs)
+                  return (
+                    <div
+                      key={ev.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() =>
                         navigate('/admin/eventos/detalle', { eventId: ev.id })
                       }
-                    }}
-                    className="p-4 rounded-xl vv-bg-elevated border vv-border-gold hover:vv-border-gold-strong flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-all"
-                  >
-                    <div className="space-y-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <VvBadge variant="gold">
-                          {getCategoryName(ev.categoryId)}
-                        </VvBadge>
-                        <span className="vv-font-mono text-xs vv-text-gold-light">
-                          {formatReadableDate(ev.date)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          navigate('/admin/eventos/detalle', { eventId: ev.id })
+                        }
+                      }}
+                      className="p-4 rounded-xl vv-bg-elevated border vv-border-gold hover:vv-border-gold-strong flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-all"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <VvBadge variant="gold">
+                            {getCategoryName(ev.categoryId)}
+                          </VvBadge>
+                          <span className="vv-font-mono text-xs vv-text-gold-light">
+                            {formatReadableDate(ev.date)}
+                          </span>
+                        </div>
+                        <div className="font-semibold text-base vv-text-primary">
+                          {ev.name}
+                        </div>
+                        <div className="text-xs vv-text-secondary">
+                          Cliente:{' '}
+                          <strong className="vv-text-primary">
+                            {ev.clientName}
+                          </strong>{' '}
+                          ({ev.phone}) · Lugar: {ev.venue}
+                        </div>
+                      </div>
+
+                      <div className="flex sm:flex-col items-center sm:items-end justify-between gap-1 shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 vv-border-gold">
+                        <div className="text-xs vv-text-muted">
+                          Saldo que falta:
+                        </div>
+                        <div className="vv-font-serif text-lg font-bold vv-text-gold-metallic">
+                          Bs. {pending.toLocaleString()}
+                        </div>
+                        <span className="text-xs vv-text-gold-light underline">
+                          Ver Detalle →
                         </span>
                       </div>
-                      <div className="font-semibold text-base vv-text-primary">
-                        {ev.name}
-                      </div>
-                      <div className="text-xs vv-text-secondary">
-                        Cliente:{' '}
-                        <strong className="vv-text-primary">
-                          {ev.clientName}
-                        </strong>{' '}
-                        ({ev.phone}) · Lugar: {ev.venue}
-                      </div>
                     </div>
-
-                    <div className="flex sm:flex-col items-center sm:items-end justify-between gap-1 shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 vv-border-gold">
-                      <div className="text-xs vv-text-muted">
-                        Saldo que falta:
-                      </div>
-                      <div className="vv-font-serif text-lg font-bold vv-text-gold-metallic">
-                        Bs. {pending.toLocaleString()}
-                      </div>
-                      <span className="text-xs vv-text-gold-light underline">
-                        Ver Detalle →
-                      </span>
-                    </div>
-                  </div>
-                )
-              })}
+                  )
+                })
+              )}
             </div>
           </VvCard>
         </>

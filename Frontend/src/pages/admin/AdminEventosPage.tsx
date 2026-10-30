@@ -113,13 +113,18 @@ export function AdminEventosPage() {
 
       {/* LISTA / GRILLA DE TARJETAS DE EVENTOS */}
       {displayedEvents.length === 0 ? (
-        <VvCard variant="surface" className="p-10 text-center space-y-3">
+        <VvCard variant="surface" className="p-10 text-center space-y-4 max-w-md mx-auto">
           <VvHeading level={3} variant="serif">
             No hay eventos en esta pestaña
           </VvHeading>
-          <p className="text-xs vv-text-secondary">
-            Usa el botón &ldquo;+ Registrar Evento&rdquo; para añadir una nueva celebración.
+          <p className="text-xs vv-text-secondary leading-relaxed">
+            Usa el botón &ldquo;+ Registrar Evento&rdquo; para registrar una nueva celebración y agendar su fecha.
           </p>
+          <div>
+            <VvButton size="sm" variant="gold" onClick={handleOpenCreateEvent}>
+              + Registrar Primer Evento
+            </VvButton>
+          </div>
         </VvCard>
       ) : (
         <div

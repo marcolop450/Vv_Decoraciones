@@ -15,7 +15,7 @@ import type {
   VvBusinessConfigState,
 } from '../types/vv-app'
 
-const STORAGE_KEY = 'vv_decoracion_full_app_v2'
+const STORAGE_KEY = 'vv_decoracion_clean_v1'
 
 const VALID_ROUTES: AppRoute[] = [
   '/landing',
@@ -34,10 +34,7 @@ const VALID_ROUTES: AppRoute[] = [
 interface VvAppContextValue {
   currentRoute: AppRoute
   navigate: (route: AppRoute, options?: { eventId?: string; editEventId?: string | null }) => void
-  deviceMode: 'desktop' | 'mobile'
   isMobileView: boolean
-  toggleDeviceMode: () => void
-  setDeviceMode: (mode: 'desktop' | 'mobile') => void
   state: VvAppDataState
   selectedEventId: string
   editingEventId: string | null
@@ -79,7 +76,6 @@ function resolveInitialRoute(): AppRoute {
 
 export function VvAppProvider({ children }: { children: React.ReactNode }) {
   const [currentRoute, setCurrentRoute] = useState<AppRoute>(resolveInitialRoute)
-  const [deviceMode, setDeviceMode] = useState<'desktop' | 'mobile'>('desktop')
   const [isNarrowScreen, setIsNarrowScreen] = useState<boolean>(() =>
     typeof window !== 'undefined' ? window.innerWidth < 768 : false
   )
@@ -104,7 +100,7 @@ export function VvAppProvider({ children }: { children: React.ReactNode }) {
   })
 
   const [selectedEventId, setSelectedEventId] = useState<string>(
-    () => state.events[0]?.id || 'evt-101'
+    () => state.events[0]?.id || ''
   )
   const [editingEventId, setEditingEventId] = useState<string | null>(null)
   const [quotePhoto, setQuotePhoto] = useState<CatalogPhoto | null>(null)
@@ -159,6 +155,50 @@ export function VvAppProvider({ children }: { children: React.ReactNode }) {
             }
           })
         }
+
+        const { data: eventData } = await supabase
+          .from('eventos')
+          .select('*')
+          .order('fecha_evento', { ascending: true })
+
+        if (eventData && (eventData as any[]).length > 0 && isMounted) {
+          setState((prev) => ({
+            ...prev,
+            events: (eventData as any[]).map((e) => ({
+              id: e.id,
+              name: e.titulo,
+              clientName: e.cliente_nombre,
+              phone: e.cliente_telefono,
+              venue: e.ubicacion,
+              date: e.fecha_evento,
+              categoryId: e.categoria_slug || 'bodas',
+              totalPriceBs: Number(e.total_bs) || 0,
+              advancePriceBs: Number(e.adelanto_bs) || 0,
+              status: e.estado === 'finalizado' ? 'completado' : 'activo',
+              createdAt: e.created_at,
+            })),
+          }))
+        }
+
+        const { data: photosData } = await supabase
+          .from('fotos_evento')
+          .select('*')
+          .order('created_at', { ascending: false })
+
+        if (photosData && (photosData as any[]).length > 0 && isMounted) {
+          setState((prev) => ({
+            ...prev,
+            photos: (photosData as any[]).map((p) => ({
+              id: p.id,
+              name: p.titulo,
+              description: p.descripcion || '',
+              imageUrl: p.public_url,
+              categoryId: p.categoria_slug || 'bodas',
+              createdAt: p.created_at,
+              sourceEventId: p.evento_id,
+            })),
+          }))
+        }
       } catch {
         // Fallback silencioso si offline
       }
@@ -177,16 +217,7 @@ export function VvAppProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  const isMobileView = deviceMode === 'mobile' || isNarrowScreen
-
-  const toggleDeviceMode = () => {
-    setDeviceMode((prev) => (prev === 'desktop' ? 'mobile' : 'desktop'))
-    try {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    } catch {
-      // Ignore scroll errors
-    }
-  }
+  const isMobileView = isNarrowScreen
 
   useEffect(() => {
     const handlePopState = () => {
@@ -643,10 +674,7 @@ export function VvAppProvider({ children }: { children: React.ReactNode }) {
       value={{
         currentRoute,
         navigate,
-        deviceMode,
         isMobileView,
-        toggleDeviceMode,
-        setDeviceMode,
         state,
         selectedEventId,
         editingEventId,
