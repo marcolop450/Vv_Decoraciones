@@ -14,12 +14,12 @@ export function WhatsAppQuoteModal() {
   const { quotePhoto, closeWhatsAppQuote, getCategoryName, state } = useVvApp()
   const todayIso = useMemo(() => getLocalIsoDate(0), [])
   const [selectedDate, setSelectedDate] = useState<string>('')
+  const [copiedImageAlert, setCopiedImageAlert] = useState(false)
 
   if (!quotePhoto) return null
 
   const targetPhone = (state.config?.whatsappPhone || '59177885220').replace(/[^0-9]/g, '')
   
-  // Si la imagen es base64 (data:image/...), no se incluye en el enlace de texto para evitar exceder el límite de URL
   const isRealHttpUrl = Boolean(
     quotePhoto.imageUrl &&
     (quotePhoto.imageUrl.startsWith('http://') || quotePhoto.imageUrl.startsWith('https://'))
@@ -34,15 +34,77 @@ export function WhatsAppQuoteModal() {
     ? `Hola, quiero cotizar la decoración ${quotePhoto.name} para la fecha ${readableDate} (${selectedDate}).${photoUrlInfo}`
     : `Hola, quiero consultar por la decoración ${quotePhoto.name}.${photoUrlInfo}`
 
-  const handleSendWhatsApp = () => {
+  const handleSendWhatsApp = async () => {
+    // 1. Si el navegador soporta compartir archivos nativamente (móviles y tablets), adjunta la foto directo a WhatsApp
+    if (typeof navigator !== 'undefined' && quotePhoto.imageUrl) {
+      try {
+        const response = await fetch(quotePhoto.imageUrl)
+        const blob = await response.blob()
+        const mimeType = blob.type || 'image/jpeg'
+        const ext = mimeType.includes('png') ? 'png' : 'jpg'
+        const file = new File(
+          [blob],
+          `decoracion_${quotePhoto.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}.${ext}`,
+          { type: mimeType }
+        )
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: `Cotización: ${quotePhoto.name}`,
+            text: whatsappMessage,
+          })
+          handleClose()
+          return
+        }
+      } catch {
+        // Si el usuario cancela o no hay soporte de archivos, continúa al enlace directo
+      }
+    }
+
+    // 2. Enlace universal directo wa.me
     const encoded = encodeURIComponent(whatsappMessage)
     const url = `https://wa.me/${targetPhone}?text=${encoded}`
     window.open(url, '_blank', 'noopener,noreferrer')
     handleClose()
   }
 
+  const handleCopyImage = async () => {
+    if (!quotePhoto.imageUrl) return
+    try {
+      const response = await fetch(quotePhoto.imageUrl)
+      const blob = await response.blob()
+      if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
+        // En navegadores modernos solo se soporta image/png en portapapeles directo
+        const img = new Image()
+        img.crossOrigin = 'anonymous'
+        img.src = quotePhoto.imageUrl
+        await new Promise((resolve) => {
+          img.onload = resolve
+        })
+        const canvas = document.createElement('canvas')
+        canvas.width = img.width
+        canvas.height = img.height
+        const ctx = canvas.getContext('2d')
+        ctx?.drawImage(img, 0, 0)
+        canvas.toBlob(async (pngBlob) => {
+          if (pngBlob) {
+            await navigator.clipboard.write([
+              new ClipboardItem({ 'image/png': pngBlob }),
+            ])
+            setCopiedImageAlert(true)
+            setTimeout(() => setCopiedImageAlert(false), 3000)
+          }
+        }, 'image/png')
+      }
+    } catch {
+      // Ignora si no hay permisos de portapapeles
+    }
+  }
+
   const handleClose = () => {
     setSelectedDate('')
+    setCopiedImageAlert(false)
     closeWhatsAppQuote()
   }
 
@@ -74,7 +136,7 @@ export function WhatsAppQuoteModal() {
           </VvButton>
         </div>
 
-        <div className="flex gap-3 p-3 rounded-xl vv-bg-elevated border vv-border-gold">
+        <div className="flex gap-3 p-3 rounded-xl vv-bg-elevated border vv-border-gold items-center">
           <div className="w-20 h-20 rounded-lg overflow-hidden border vv-border-gold shrink-0">
             <img
               src={quotePhoto.imageUrl}
@@ -82,10 +144,17 @@ export function WhatsAppQuoteModal() {
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="min-w-0 text-xs space-y-1">
-            <p className="vv-text-secondary line-clamp-3">
+          <div className="min-w-0 flex-1 text-xs space-y-1.5">
+            <p className="vv-text-secondary line-clamp-2">
               {quotePhoto.description}
             </p>
+            <button
+              type="button"
+              onClick={handleCopyImage}
+              className="text-[11px] vv-text-gold hover:underline font-medium inline-flex items-center gap-1"
+            >
+              <span>{copiedImageAlert ? '✓ Imagen copiada para pegar en WhatsApp' : 'Copiar imagen al portapapeles'}</span>
+            </button>
           </div>
         </div>
 

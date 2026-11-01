@@ -19,6 +19,7 @@ export function CategoryManagementModal({
   const [newCatName, setNewCatName] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingName, setEditingName] = useState('')
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [feedback, setFeedback] = useState<string | null>(null)
 
@@ -42,6 +43,7 @@ export function CategoryManagementModal({
   const handleStartEdit = (id: string, currentName: string) => {
     setEditingId(id)
     setEditingName(currentName)
+    setConfirmDeleteId(null)
   }
 
   const handleSaveEdit = async (id: string) => {
@@ -58,10 +60,10 @@ export function CategoryManagementModal({
   }
 
   const handleDelete = async (id: string, name: string) => {
-    if (!window.confirm(`¿Estás seguro de eliminar la categoría "${name}"?`)) return
     setSubmitting(true)
     try {
       await deleteCategory(id)
+      setConfirmDeleteId(null)
       setFeedback(`Categoría "${name}" eliminada.`)
       setTimeout(() => setFeedback(null), 2500)
     } finally {
@@ -176,24 +178,46 @@ export function CategoryManagementModal({
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <VvButton
-                          size="sm"
-                          variant="subtle"
-                          onClick={() => handleStartEdit(cat.id, cat.name)}
-                          disabled={submitting}
-                        >
-                          Editar
-                        </VvButton>
-                        <VvButton
-                          size="sm"
-                          variant="danger"
-                          onClick={() => handleDelete(cat.id, cat.name)}
-                          disabled={submitting}
-                        >
-                          Eliminar
-                        </VvButton>
-                      </div>
+                      {confirmDeleteId === cat.id ? (
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span className="text-[11px] text-red-400 font-medium">¿Seguro?</span>
+                          <VvButton
+                            size="sm"
+                            variant="danger"
+                            onClick={() => handleDelete(cat.id, cat.name)}
+                            disabled={submitting}
+                          >
+                            Sí, eliminar
+                          </VvButton>
+                          <VvButton
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setConfirmDeleteId(null)}
+                            disabled={submitting}
+                          >
+                            No
+                          </VvButton>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <VvButton
+                            size="sm"
+                            variant="subtle"
+                            onClick={() => handleStartEdit(cat.id, cat.name)}
+                            disabled={submitting}
+                          >
+                            Editar
+                          </VvButton>
+                          <VvButton
+                            size="sm"
+                            variant="danger"
+                            onClick={() => setConfirmDeleteId(cat.id)}
+                            disabled={submitting}
+                          >
+                            Eliminar
+                          </VvButton>
+                        </div>
+                      )}
                     </>
                   )}
                 </div>

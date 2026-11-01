@@ -23,8 +23,10 @@ test.describe('Navegación Móvil y Responsividad Fluida', () => {
   test('El panel de administración en móvil muestra la barra inferior nativa y menú Más', async ({ page }) => {
     await page.goto('/login')
 
-    // Acceso directo
-    await page.getByRole('button', { name: /Acceso Exitoso Directo/i }).click()
+    // Iniciar sesión legítimamente
+    await page.getByPlaceholder(/veronica@gmail.com/i).fill('veronica@gmail.com')
+    await page.getByPlaceholder(/••••••••/i).fill('20042008')
+    await page.getByRole('button', { name: /Iniciar Sesión/i }).click()
     await expect(page).toHaveURL(/.*\/admin\/inicio/)
 
     // La barra de navegación inferior móvil debe estar visible

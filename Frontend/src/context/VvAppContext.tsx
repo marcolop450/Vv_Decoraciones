@@ -464,11 +464,13 @@ export function VvAppProvider({ children }: { children: React.ReactNode }) {
     const trimmed = name.trim()
     if (!trimmed) return
 
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
     try {
-      await supabase
-        .from('categorias')
-        .update({ nombre: trimmed })
-        .or(`slug.eq.${id},id.eq.${id}`)
+      if (isUuid) {
+        await supabase.from('categorias').update({ nombre: trimmed }).eq('id', id)
+      } else {
+        await supabase.from('categorias').update({ nombre: trimmed }).eq('slug', id)
+      }
     } catch {
       // offline fallback
     }
@@ -495,11 +497,17 @@ export function VvAppProvider({ children }: { children: React.ReactNode }) {
     const target = state.categories.find((c) => c.id === id)
     if (!target) return
 
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
     try {
-      await supabase
-        .from('categorias')
-        .delete()
-        .or(`slug.eq.${id},id.eq.${id}`)
+      // Desvincular eventos y fotos en Supabase si tienen este slug para evitar restricción foreign key
+      if (!isUuid) {
+        await supabase.from('eventos').update({ categoria_slug: null }).eq('categoria_slug', id)
+      }
+      if (isUuid) {
+        await supabase.from('categorias').delete().eq('id', id)
+      } else {
+        await supabase.from('categorias').delete().eq('slug', id)
+      }
     } catch {
       // offline fallback
     }

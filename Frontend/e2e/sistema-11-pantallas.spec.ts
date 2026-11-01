@@ -2,8 +2,9 @@ import { test, expect } from '@playwright/test'
 
 async function loginAsAdmin(page: any) {
   await page.goto('/login')
-  const accesoBtn = page.getByRole('button', { name: /Acceso Exitoso Directo/i })
-  await accesoBtn.click()
+  await page.getByPlaceholder(/veronica@gmail.com/i).fill('veronica@gmail.com')
+  await page.getByPlaceholder(/••••••••/i).fill('20042008')
+  await page.getByRole('button', { name: /Iniciar Sesión/i }).click()
   await expect(page).toHaveURL(/.*\/admin\/inicio/)
 }
 
@@ -48,19 +49,18 @@ test.describe('Sistema 11 Pantallas Figma - Eventos Vero', () => {
     await expect(page).toHaveTitle(/login/i)
     await expect(page.getByRole('heading', { name: /Panel de Administración V.v/i })).toBeVisible()
 
-    // Probar intento fallido simulado
-    const simularFalloBtn = page.getByRole('button', { name: /Simular Fallo de Login/i })
-    await expect(simularFalloBtn).toBeVisible()
-    await simularFalloBtn.click()
+    // Probar intento fallido con credenciales inválidas
+    await page.getByPlaceholder(/veronica@gmail.com/i).fill('error@admin.com')
+    await page.getByPlaceholder(/••••••••/i).fill('claveerronea')
+    await page.getByRole('button', { name: /Iniciar Sesión/i }).click()
 
-    // Debe mostrarse alerta roja de error
+    // Debe mostrarse alerta de error
     await expect(page.getByRole('alert')).toBeVisible()
-    await expect(page.getByText(/Credenciales incorrectas/i)).toBeVisible()
 
-    // Probar acceso exitoso directo
-    const accesoExitosoBtn = page.getByRole('button', { name: /Acceso Exitoso Directo/i })
-    await expect(accesoExitosoBtn).toBeVisible()
-    await accesoExitosoBtn.click()
+    // Probar acceso con credenciales legítimas del dueño
+    await page.getByPlaceholder(/veronica@gmail.com/i).fill('veronica@gmail.com')
+    await page.getByPlaceholder(/••••••••/i).fill('20042008')
+    await page.getByRole('button', { name: /Iniciar Sesión/i }).click()
 
     // Debe redirigir a /admin/inicio
     await expect(page).toHaveURL(/.*\/admin\/inicio/)
@@ -75,10 +75,17 @@ test.describe('Sistema 11 Pantallas Figma - Eventos Vero', () => {
     const catModal = page.getByRole('dialog', { name: /Gestión de Categorías de Decoración/i })
     await expect(catModal).toBeVisible()
 
-    // Crear nueva categoría
-    await page.getByLabel(/Nombre de la Nueva Categoría/i).fill('Mesas Dulces VIP')
+    // Crear nueva categoría de prueba
+    await page.getByLabel(/Nombre de la Nueva Categoría/i).fill('Categoria Temporal E2E')
     await page.getByRole('button', { name: /\+ Crear/i }).click()
-    await expect(page.getByText('Mesas Dulces VIP')).toBeVisible()
+    await expect(page.getByText('Categoria Temporal E2E')).toBeVisible()
+
+    // Eliminar la categoría creada para dejar la base de datos limpia
+    await page.getByRole('button', { name: /Eliminar/i }).first().click()
+    const confirmBtn = page.getByRole('button', { name: /Sí, eliminar/i })
+    if (await confirmBtn.isVisible()) {
+      await confirmBtn.click()
+    }
 
     // Cerrar modal
     await catModal.getByRole('button', { name: /✕ Cerrar/i }).click()

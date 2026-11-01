@@ -26,31 +26,48 @@ export function AdminInicioPage() {
     title: string
     description: string
     metric: string
-    badge: string
+    icon: React.ReactNode
   }[] = [
-    {
-      route: '/admin/fotos',
-      title: 'Fotos del Catálogo',
-      description:
-        'Subir nuevas decoraciones, editar descripciones o crear categorías para el público.',
-      metric: `${state.photos.length} Fotos Publicadas`,
-      badge: 'Catálogo Público',
-    },
     {
       route: '/admin/eventos',
       title: 'Administrar Eventos',
       description:
         'Gestionar eventos activos y completados, registrar clientes, adelantos y saldos.',
       metric: `${activeEvents.length} Activos · ${completedEvents.length} Realizados`,
-      badge: 'Operaciones',
+      icon: (
+        <svg className="w-5 h-5 text-[#D4AF37]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+        </svg>
+      ),
     },
     {
       route: '/admin/calendario',
       title: 'Calendario de Eventos',
       description:
-        'Revisa el mes actual, el día de hoy y las fechas ocupadas con acceso directo al detalle.',
+        'Revisa el mes actual, el día de hoy y las fechas ocupadas con acceso directo a la agenda.',
       metric: `${activeEvents.length} Fechas Programadas`,
-      badge: 'Agenda Mensual',
+      icon: (
+        <svg className="w-5 h-5 text-[#D4AF37]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+      ),
+    },
+    {
+      route: '/admin/fotos',
+      title: 'Fotos del Catálogo',
+      description:
+        'Subir nuevas decoraciones, editar descripciones o crear categorías para el público.',
+      metric: `${state.photos.length} Fotos Publicadas`,
+      icon: (
+        <svg className="w-5 h-5 text-[#D4AF37]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="3" y="4" width="18" height="16" rx="2" />
+          <circle cx="8.5" cy="9.5" r="1.5" />
+          <path d="M21 15l-5-5L5 20" />
+        </svg>
+      ),
     },
     {
       route: '/admin/reportes',
@@ -58,15 +75,28 @@ export function AdminInicioPage() {
       description:
         'Consulta ingresos, saldos pendientes por cobrar y pregunta al asistente inteligente.',
       metric: `Bs. ${totalPendingBs.toLocaleString()} por cobrar`,
-      badge: 'Finanzas & IA',
+      icon: (
+        <svg className="w-5 h-5 text-[#D4AF37]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <line x1="18" y1="20" x2="18" y2="10" />
+          <line x1="12" y1="20" x2="12" y2="4" />
+          <line x1="6" y1="20" x2="6" y2="14" />
+        </svg>
+      ),
     },
     {
       route: '/admin/bitacora',
       title: 'Bitácora de la Página',
       description:
-        'Historial cronológico de inicios de sesión, creaciones, ediciones, eliminaciones y errores.',
+        'Historial cronológico de inicios de sesión, creaciones, ediciones, eliminaciones y registros.',
       metric: `${state.bitacora.length} Movimientos`,
-      badge: 'Auditoría',
+      icon: (
+        <svg className="w-5 h-5 text-[#D4AF37]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" />
+        </svg>
+      ),
     },
   ]
 
@@ -76,13 +106,14 @@ export function AdminInicioPage() {
       subtitle="Accesos directos rápidos optimizados para escritorio y móvil, junto con el estado de tus eventos activos de la semana."
       headerActions={
         <VvButton
-          size="md"
+          size="sm"
           variant="gold"
           onClick={() =>
             navigate('/admin/eventos/nuevo', { editEventId: null })
           }
+          className="whitespace-nowrap shadow-sm hover:shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all"
         >
-          + Registrar Nuevo Evento
+          + Registrar Evento
         </VvButton>
       }
     >
@@ -111,20 +142,30 @@ export function AdminInicioPage() {
             <div className="text-xs font-semibold uppercase tracking-wider vv-text-muted">
               Accesos Rápidos
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-2.5">
               {shortcuts.map((item) => (
                 <VvCard
                   key={item.route}
                   variant="surface"
                   onClick={() => navigate(item.route)}
-                  className="p-3.5 flex flex-col justify-between gap-2 hover:vv-border-gold-strong"
+                  className="p-3.5 flex items-center justify-between gap-3 border vv-border-gold hover:border-[#D4AF37] transition-all cursor-pointer"
                 >
-                  <div className="font-semibold text-sm vv-text-primary">
-                    {item.title}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-8 h-8 rounded-lg vv-bg-elevated border vv-border-gold flex items-center justify-center shrink-0">
+                      {item.icon}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-semibold text-sm vv-text-primary truncate">
+                        {item.title}
+                      </div>
+                      <div className="text-xs vv-text-gold-light font-medium">
+                        {item.metric}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-xs vv-text-gold-light font-medium">
-                    {item.metric}
-                  </div>
+                  <span className="text-xs vv-text-muted shrink-0 font-medium">
+                    Abrir →
+                  </span>
                 </VvCard>
               ))}
             </div>
@@ -195,6 +236,7 @@ export function AdminInicioPage() {
         </div>
       ) : (
         <>
+          {/* Tarjetas Principales de Métricas (Sin texto redundante) */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <VvCard variant="gold-highlight" className="p-5 space-y-1">
               <div className="text-xs uppercase tracking-wider vv-text-gold-light font-semibold">
@@ -203,57 +245,48 @@ export function AdminInicioPage() {
               <div className="vv-font-serif text-3xl font-bold vv-text-primary">
                 {activeEvents.length} Eventos
               </div>
-              <p className="text-xs vv-text-secondary">
-                En preparación y montaje programado
-              </p>
             </VvCard>
 
-            <VvCard variant="surface" className="p-5 space-y-1">
+            <VvCard variant="surface" className="p-5 space-y-1 border vv-border-gold">
               <div className="text-xs uppercase tracking-wider vv-text-muted font-semibold">
                 Saldo Pendiente por Cobrar
               </div>
               <div className="vv-font-serif text-3xl font-bold vv-text-gold-metallic">
                 Bs. {totalPendingBs.toLocaleString()}
               </div>
-              <p className="text-xs vv-text-secondary">
-                Calculado sobre eventos activos
-              </p>
             </VvCard>
 
-            <VvCard variant="surface" className="p-5 space-y-1">
+            <VvCard variant="surface" className="p-5 space-y-1 border vv-border-gold">
               <div className="text-xs uppercase tracking-wider vv-text-muted font-semibold">
                 Decoraciones en Catálogo
               </div>
               <div className="vv-font-serif text-3xl font-bold vv-text-primary">
                 {state.photos.length} Fotos
               </div>
-              <p className="text-xs vv-text-secondary">
-                En {state.categories.length} categorías activas
-              </p>
             </VvCard>
           </div>
 
           <VvOrnamentDivider label="Accesos Directos Rápidos" />
 
+          {/* Grilla Recreada de Accesos Rápidos (Elegante y Limpia) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {shortcuts.map((item) => (
               <VvCard
                 key={item.route}
                 variant="surface"
                 onClick={() => navigate(item.route)}
-                className="p-5 flex flex-col justify-between gap-4 hover:vv-border-gold-strong"
+                className="p-5 flex flex-col justify-between gap-4 vv-animate-card hover:-translate-y-1.5 hover:border-[#D4AF37]/80 transition-all duration-300 cursor-pointer group shadow-sm hover:shadow-[0_8px_30px_rgba(212,175,55,0.15)] border vv-border-gold"
               >
                 <div className="space-y-2.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <VvBadge variant="gold">{item.badge}</VvBadge>
-                    <span className="vv-font-mono text-xs vv-text-muted">
-                      {item.route}
-                    </span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl vv-bg-elevated border vv-border-gold flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                      {item.icon}
+                    </div>
+                    <VvHeading level={3} variant="serif" className="group-hover:text-[#F3D37A] transition-colors text-lg">
+                      {item.title}
+                    </VvHeading>
                   </div>
-                  <VvHeading level={3} variant="serif">
-                    {item.title}
-                  </VvHeading>
-                  <p className="text-xs vv-text-secondary leading-relaxed">
+                  <p className="text-xs vv-text-secondary leading-relaxed pt-1">
                     {item.description}
                   </p>
                 </div>
@@ -262,8 +295,8 @@ export function AdminInicioPage() {
                   <span className="text-xs font-semibold vv-text-gold-light">
                     {item.metric}
                   </span>
-                  <span className="text-xs vv-text-primary font-semibold">
-                    Abrir →
+                  <span className="text-xs vv-text-primary font-semibold group-hover:text-[#D4AF37] transition-colors flex items-center gap-1">
+                    Abrir <span className="transition-transform group-hover:translate-x-1">→</span>
                   </span>
                 </div>
               </VvCard>
@@ -272,18 +305,14 @@ export function AdminInicioPage() {
 
           <VvOrnamentDivider label="Eventos Activos de la Semana" />
 
-          <VvCard variant="surface" className="p-5 sm:p-6 space-y-4">
+          <VvCard variant="surface" className="p-5 sm:p-6 space-y-4 border vv-border-gold">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <VvHeading level={3} variant="serif">
                   Agenda Próxima de Eventos Activos
                 </VvHeading>
                 <p className="text-xs vv-text-secondary">
-                  Haz clic en cualquier evento para abrir su ficha completa en{' '}
-                  <span className="vv-font-mono vv-text-gold-light">
-                    /admin/eventos/detalle
-                  </span>
-                  .
+                  Selecciona cualquier evento para consultar y actualizar sus detalles de montaje.
                 </p>
               </div>
               <VvButton
@@ -330,7 +359,7 @@ export function AdminInicioPage() {
                           navigate('/admin/eventos/detalle', { eventId: ev.id })
                         }
                       }}
-                      className="p-4 rounded-xl vv-bg-elevated border vv-border-gold hover:vv-border-gold-strong flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-all"
+                      className="p-4 rounded-xl vv-bg-elevated border vv-border-gold hover:border-[#D4AF37] flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-all hover:-translate-y-0.5"
                     >
                       <div className="space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
@@ -355,7 +384,7 @@ export function AdminInicioPage() {
 
                       <div className="flex sm:flex-col items-center sm:items-end justify-between gap-1 shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 vv-border-gold">
                         <div className="text-xs vv-text-muted">
-                          Saldo que falta:
+                          Saldo pendiente:
                         </div>
                         <div className="vv-font-serif text-lg font-bold vv-text-gold-metallic">
                           Bs. {pending.toLocaleString()}

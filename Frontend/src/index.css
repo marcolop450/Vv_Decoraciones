@@ -72,11 +72,17 @@
 }
 
 @layer base {
+  html {
+    scrollbar-gutter: stable;
+    overflow-y: scroll;
+  }
+
   body {
     background-color: var(--vv-bg-base);
     color: var(--vv-text-primary);
     font-family: var(--vv-font-sans);
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 }
 
