@@ -71,6 +71,7 @@ export interface ReportChatMessage {
   sender: 'user' | 'bot'
   text: string
   time: string
+  agentRole?: 'finanzas' | 'agenda' | 'ventas'
   upcomingEventsCard?: {
     id: string
     name: string
@@ -78,6 +79,12 @@ export interface ReportChatMessage {
     date: string
     venue: string
     pendingBalanceBs: number
+  }[]
+  attachedPhotosCard?: {
+    id: string
+    name: string
+    imageUrl: string
+    description: string
   }[]
 }
 

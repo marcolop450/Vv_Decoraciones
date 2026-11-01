@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { AiAssistantService, type AgentRole } from '../services/aiAssistantService'
 import {
   createInitialVvState,
   getCurrentTimestampLabel,
@@ -57,7 +58,7 @@ interface VvAppContextValue {
   deleteEvent: (id: string) => void
   markEventCompleted: (id: string) => EventRecord | null
   updateBusinessConfig: (newConfig: Partial<VvBusinessConfigState>) => Promise<void>
-  sendReportChatMessage: (text: string) => void
+  sendReportChatMessage: (text: string, role?: AgentRole) => Promise<void>
   logBitacora: (
     action: BitacoraActionType,
     detail: string,
@@ -704,52 +705,16 @@ export function VvAppProvider({ children }: { children: React.ReactNode }) {
     return updated
   }
 
-  const sendReportChatMessage = (text: string) => {
+  const sendReportChatMessage = async (
+    text: string,
+    role: AgentRole = 'finanzas'
+  ) => {
     const trimmed = text.trim()
     if (!trimmed) return
 
-    const lower = trimmed.toLowerCase()
-    const activeEvents = state.events.filter((e) => e.status === 'activo')
-    const totalIncome = state.events.reduce((acc, e) => acc + e.totalPriceBs, 0)
-    const totalPending = activeEvents.reduce(
-      (acc, e) => acc + Math.max(0, e.totalPriceBs - e.advancePriceBs),
-      0
-    )
-
-    let botReply = ''
-    let includeUpcomingCard = false
-
-    if (
-      lower.includes('siguientes días') ||
-      lower.includes('próximos') ||
-      lower.includes('proximos') ||
-      lower.includes('qué evento') ||
-      lower.includes('que evento') ||
-      lower.includes('agenda')
-    ) {
-      botReply = `Tienes ${activeEvents.length} eventos activos programados para los siguientes días. Aquí tienes el detalle con fechas, clientes y saldos pendientes:`
-      includeUpcomingCard = true
-    } else if (
-      lower.includes('saldo') ||
-      lower.includes('falta') ||
-      lower.includes('cobrar')
-    ) {
-      botReply = `El saldo total pendiente por cobrar de los ${activeEvents.length} eventos activos es de Bs. ${totalPending.toLocaleString()}.`
-      includeUpcomingCard = true
-    } else if (lower.includes('categoría') || lower.includes('categoria')) {
-      const summary = state.categories
-        .map((c) => {
-          const count = state.events.filter((e) => e.categoryId === c.id).length
-          return `${c.name}: ${count} evento(s)`
-        })
-        .join(' · ')
-      botReply = `Distribución actual de eventos por categoría: ${summary}.`
-    } else {
-      botReply = `Resumen general: tienes ${state.events.length} eventos registrados (${activeEvents.length} activos), ingresos totales contratados por Bs. ${totalIncome.toLocaleString()} y un saldo pendiente por cobrar de Bs. ${totalPending.toLocaleString()}.`
-    }
-
     const nowTime = getCurrentTimestampLabel().split('·')[1]?.trim() || 'Ahora'
 
+    // Agregar mensaje del usuario
     setState((prev) => ({
       ...prev,
       reportChat: [
@@ -759,22 +724,38 @@ export function VvAppProvider({ children }: { children: React.ReactNode }) {
           sender: 'user',
           text: trimmed,
           time: nowTime,
+          agentRole: role,
         },
+      ],
+    }))
+
+    // Consultar el servicio multi-agente con 6 guardrails y fallback
+    const res = await AiAssistantService.queryAgent(trimmed, role, state)
+
+    setState((prev) => ({
+      ...prev,
+      reportChat: [
+        ...prev.reportChat,
         {
           id: `rchat-b-${Date.now() + 1}`,
           sender: 'bot',
-          text: botReply,
+          text: res.text,
           time: nowTime,
-          upcomingEventsCard: includeUpcomingCard
-            ? activeEvents.map((e) => ({
-                id: e.id,
-                name: e.name,
-                clientName: e.clientName,
-                date: e.date,
-                venue: e.venue,
-                pendingBalanceBs: Math.max(0, e.totalPriceBs - e.advancePriceBs),
-              }))
-            : undefined,
+          agentRole: res.agentRole,
+          upcomingEventsCard: res.attachedEvents?.map((e) => ({
+            id: e.id,
+            name: e.name,
+            clientName: e.clientName,
+            date: e.date,
+            venue: e.venue,
+            pendingBalanceBs: Math.max(0, e.totalPriceBs - e.advancePriceBs),
+          })),
+          attachedPhotosCard: res.attachedPhotos?.map((p) => ({
+            id: p.id,
+            name: p.name,
+            imageUrl: p.imageUrl,
+            description: p.description,
+          })),
         },
       ],
     }))

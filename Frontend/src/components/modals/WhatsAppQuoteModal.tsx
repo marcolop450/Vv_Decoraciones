@@ -57,12 +57,13 @@ export function WhatsAppQuoteModal() {
   if (!quotePhoto) return null
 
   const targetPhone = (state.config?.whatsappPhone || '59177885220').replace(/[^0-9]/g, '')
-  const photoUrlInfo = quotePhoto.imageUrl && quotePhoto.imageUrl.startsWith('http')
-    ? `\nFoto de referencia: ${quotePhoto.imageUrl}`
+  const photoUrlInfo = quotePhoto.imageUrl
+    ? `\n\nFoto de referencia:\n${quotePhoto.imageUrl}`
     : ''
   const hasValidDate = Boolean(selectedDate && selectedDate >= todayIso)
+  const readableDate = hasValidDate ? formatReadableDate(selectedDate) : ''
   const whatsappMessage = hasValidDate
-    ? `Hola, quiero cotizar la decoración ${quotePhoto.name} para la fecha ${selectedDate}.${photoUrlInfo}`
+    ? `Hola, quiero cotizar la decoración ${quotePhoto.name} para la fecha ${readableDate} (${selectedDate}).${photoUrlInfo}`
     : `Hola, quiero consultar por la decoración ${quotePhoto.name}.${photoUrlInfo}`
 
   const handleSendWhatsApp = () => {

@@ -9,11 +9,14 @@ import {
 } from '../../components/ui/VvPrimitives'
 import { useVvApp } from '../../context/VvAppContext'
 import { formatReadableDate } from '../../data/vvInitialAppData'
+import type { AgentRole } from '../../services/aiAssistantService'
 
 export function AdminReportesPage() {
-  const { state, sendReportChatMessage, navigate, isMobileView } = useVvApp()
+  const { state, sendReportChatMessage, navigate, openWhatsAppQuote, isMobileView } = useVvApp()
   const [chatInput, setChatInput] = useState('')
   const [mobileSectionTab, setMobileSectionTab] = useState<'resumen' | 'chatbot'>('chatbot')
+  const [selectedAgent, setSelectedAgent] = useState<AgentRole>('finanzas')
+  const [isSending, setIsSending] = useState(false)
 
   const activeEvents = state.events.filter((e) => e.status === 'activo')
   const completedEvents = state.events.filter((e) => e.status === 'completado')
@@ -33,10 +36,31 @@ export function AdminReportesPage() {
     0
   )
 
-  const handleSend = () => {
-    if (!chatInput.trim()) return
-    sendReportChatMessage(chatInput)
+  const handleSend = async (promptToSend?: string) => {
+    const text = (promptToSend || chatInput).trim()
+    if (!text || isSending) return
+    setIsSending(true)
     setChatInput('')
+    try {
+      await sendReportChatMessage(text, selectedAgent)
+    } finally {
+      setIsSending(false)
+    }
+  }
+
+  const agentDefaultPrompts: Record<AgentRole, string[]> = {
+    finanzas: [
+      '¿Cuánto falta por cobrar en saldos pendientes?',
+      '¿Qué clientes tienen saldo pendiente?',
+    ],
+    agenda: [
+      'Quiero ver qué evento tengo los siguientes días',
+      '¿Qué eventos tengo este fin de semana?',
+    ],
+    ventas: [
+      'Recomiéndame decoraciones para Bodas',
+      'Recomiéndame opciones para Quinceañeros',
+    ],
   }
 
   return (
@@ -179,17 +203,60 @@ export function AdminReportesPage() {
               isMobileView ? '' : 'lg:col-span-6'
             } p-5 sm:p-6 flex flex-col justify-between space-y-4`}
           >
-          <div className="flex items-center justify-between gap-2 pb-3 border-b vv-border-gold">
-            <div>
-              <VvBadge variant="gold">Asistente IA de Reportes</VvBadge>
-              <VvHeading level={3} variant="serif" className="mt-1">
-                ChatBot de Consultas Rápidas
-              </VvHeading>
+          <div className="flex flex-col gap-3 pb-3 border-b vv-border-gold">
+            <div className="flex items-center justify-between gap-2">
+              <div>
+                <VvBadge variant="gold">Asistente Inteligente de Negocio</VvBadge>
+                <VvHeading level={3} variant="serif" className="mt-1">
+                  {selectedAgent === 'finanzas'
+                    ? 'Asistente de Finanzas & Cobranzas'
+                    : selectedAgent === 'agenda'
+                    ? 'Asistente de Agenda & Montajes'
+                    : 'Asistente de Ventas & Catálogo'}
+                </VvHeading>
+              </div>
+              <VvBadge variant="success">En Línea</VvBadge>
             </div>
-            <VvBadge variant="success">En Línea</VvBadge>
+
+            {/* Selector de los 3 Agentes Especializados */}
+            <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl vv-bg-surface border vv-border-gold">
+              <button
+                type="button"
+                onClick={() => setSelectedAgent('finanzas')}
+                className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
+                  selectedAgent === 'finanzas'
+                    ? 'vv-bg-gold-gradient vv-text-on-gold shadow-sm'
+                    : 'vv-text-secondary hover:vv-text-primary'
+                }`}
+              >
+                Finanzas
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedAgent('agenda')}
+                className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
+                  selectedAgent === 'agenda'
+                    ? 'vv-bg-gold-gradient vv-text-on-gold shadow-sm'
+                    : 'vv-text-secondary hover:vv-text-primary'
+                }`}
+              >
+                Agenda
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedAgent('ventas')}
+                className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
+                  selectedAgent === 'ventas'
+                    ? 'vv-bg-gold-gradient vv-text-on-gold shadow-sm'
+                    : 'vv-text-secondary hover:vv-text-primary'
+                }`}
+              >
+                Ventas
+              </button>
+            </div>
           </div>
 
-          {/* Historial de Conversación (Incluye el ejemplo solicitado) */}
+          {/* Historial de Conversación */}
           <div className="space-y-4 max-h-96 overflow-y-auto pr-1">
             {state.reportChat.map((msg) => (
               <div
@@ -205,7 +272,7 @@ export function AdminReportesPage() {
                       : 'vv-bg-surface border vv-border-gold vv-text-primary'
                   }`}
                 >
-                  <p>{msg.text}</p>
+                  <p className="whitespace-pre-line">{msg.text}</p>
 
                   {/* Tarjeta compacta de Eventos Próximos dentro de la respuesta del Bot */}
                   {msg.upcomingEventsCard &&
@@ -251,32 +318,74 @@ export function AdminReportesPage() {
                         ))}
                       </div>
                     )}
+
+                  {/* Tarjetas de fotos recomendadas */}
+                  {msg.attachedPhotosCard &&
+                    msg.attachedPhotosCard.length > 0 && (
+                      <div className="grid grid-cols-2 gap-2 pt-2 border-t vv-border-gold">
+                        {msg.attachedPhotosCard.map((p) => (
+                          <div
+                            key={p.id}
+                            className="p-2 rounded-xl vv-bg-elevated border vv-border-gold space-y-1"
+                          >
+                            <img
+                              src={p.imageUrl}
+                              alt={p.name}
+                              className="w-full h-20 object-cover rounded-lg"
+                            />
+                            <div className="text-xs font-medium truncate vv-text-gold-light">
+                              {p.name}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                 </div>
                 <span className="vv-font-mono text-xs vv-text-muted mt-1 px-1">
-                  {msg.sender === 'user' ? 'Dueño' : 'Bot Reportes V.v'} ·{' '}
+                  {msg.sender === 'user' ? 'Verónica (Dueña)' : 'Bot Reportes V.v'} ·{' '}
                   {msg.time}
                 </span>
               </div>
             ))}
+            {isSending && (
+              <div className="flex items-center gap-2 text-xs vv-text-gold-light italic">
+                <div className="w-2 h-2 rounded-full bg-[#D4AF37] animate-pulse"></div>
+                Consultando...
+              </div>
+            )}
           </div>
 
-          {/* Botones de Consulta Rápida + Input */}
+          {/* Botones de Consulta Rápida por Defecto + Input */}
           <div className="space-y-3 pt-3 border-t vv-border-gold">
-            <div className="flex flex-wrap gap-1.5">
-              {[
-                'Quiero ver qué evento tengo los siguientes días',
-                '¿Cuánto falta por cobrar en saldos pendientes?',
-                'Resumen de eventos por categoría',
-              ].map((prompt) => (
-                <VvButton
-                  key={prompt}
-                  size="sm"
-                  variant="subtle"
-                  onClick={() => sendReportChatMessage(prompt)}
-                >
-                  {prompt}
-                </VvButton>
-              ))}
+            <div className="space-y-1">
+              <span className="text-[11px] font-semibold uppercase tracking-wider vv-text-muted">
+                Preguntas sugeridas:
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {agentDefaultPrompts[selectedAgent].map((prompt) => (
+                  <VvButton
+                    key={prompt}
+                    size="sm"
+                    variant="subtle"
+                    onClick={() => handleSend(prompt)}
+                  >
+                    {prompt}
+                  </VvButton>
+                ))}
+                {selectedAgent !== 'agenda' && (
+                  <VvButton
+                    size="sm"
+                    variant="ghost"
+                    onClick={() =>
+                      handleSend(
+                        'Quiero ver qué evento tengo los siguientes días'
+                      )
+                    }
+                  >
+                    Quiero ver qué evento tengo los siguientes días
+                  </VvButton>
+                )}
+              </div>
             </div>
 
             <div className="flex gap-2">
@@ -289,11 +398,22 @@ export function AdminReportesPage() {
                     handleSend()
                   }
                 }}
-                placeholder="Escribe tu consulta de reporte (ej. Quiero ver qué evento tengo los siguientes días)..."
+                placeholder={`Preguntar a ${
+                  selectedAgent === 'finanzas'
+                    ? 'Finanzas'
+                    : selectedAgent === 'agenda'
+                    ? 'Agenda'
+                    : 'Ventas'
+                }...`}
                 className="flex-1"
               />
-              <VvButton size="md" variant="gold" onClick={handleSend}>
-                Consultar
+              <VvButton
+                size="md"
+                variant="gold"
+                onClick={() => handleSend()}
+                disabled={isSending}
+              >
+                {isSending ? '...' : 'Consultar'}
               </VvButton>
             </div>
           </div>

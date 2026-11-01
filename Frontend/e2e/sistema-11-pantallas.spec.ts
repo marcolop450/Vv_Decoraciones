@@ -105,7 +105,7 @@ test.describe('Sistema 11 Pantallas Figma - Eventos Vero', () => {
     await page.getByLabel(/Nombre del Evento/i).fill('Gala de Aniversario E2E')
     await page.getByLabel(/Nombre del Cliente/i).fill('Cliente Automatizado')
     await page.getByLabel(/Teléfono de Contacto/i).fill('77885220')
-    await page.getByLabel(/Lugar \/ Salón de Recepciones/i).fill('Hotel Radisson')
+    await page.getByLabel(/Lugar \/ Ubicación/i).fill('Hotel Radisson')
 
     // Verificar cálculo automático de saldo pendiente
     await page.getByLabel(/Precio Total Contratado/i).fill('8000')

@@ -45,6 +45,14 @@ export function EventFormContent({
   const advanceNum = Math.max(0, Number(advancePriceStr) || 0)
   const pendingBalance = Math.max(0, totalNum - advanceNum)
 
+  const handleTotalPriceChange = (val: string) => {
+    setTotalPriceStr(val)
+    const num = Number(val)
+    if (!initialEvent && !isNaN(num) && num > 0) {
+      setAdvancePriceStr(String(Math.round(num * 0.5)))
+    }
+  }
+
   const handleSubmit = () => {
     if (!name.trim() || !clientName.trim() || !venue.trim() || !date) {
       setErrorMessage(
@@ -125,11 +133,12 @@ export function EventFormContent({
           placeholder="70145892"
         />
         <VvTextInput
-          label="Lugar / Salón de Recepciones"
+          label="Lugar / Ubicación (Salón, Casa o Colegio)"
           required
           value={venue}
           onChange={setVenue}
-          placeholder="Ej. Salón Gran Emperador"
+          placeholder="Ej. Salón Las Palmeras, Domicilio particular, Colegio..."
+          helperText="Salón, casa, colegio o cualquier ubicación del evento"
         />
       </div>
 
@@ -152,7 +161,7 @@ export function EventFormContent({
             Cálculo Automático de Saldo
           </label>
           <div className="p-3 rounded-xl vv-bg-subtle border vv-border-gold flex items-center justify-between">
-            <span className="text-xs vv-text-secondary">Saldo Pendiente:</span>
+            <span className="text-xs vv-text-secondary">Saldo a cobrar después del evento:</span>
             <span className="text-base font-bold vv-font-mono vv-text-gold-metallic">
               Bs. {pendingBalance.toLocaleString()}
             </span>
@@ -170,7 +179,7 @@ export function EventFormContent({
           type="number"
           required
           value={totalPriceStr}
-          onChange={setTotalPriceStr}
+          onChange={handleTotalPriceChange}
           placeholder="12000"
         />
         <VvTextInput
@@ -179,7 +188,8 @@ export function EventFormContent({
           required
           value={advancePriceStr}
           onChange={setAdvancePriceStr}
-          placeholder="5000"
+          placeholder="6000"
+          helperText="Sugerido habitual: 50% (la mitad), ajustable libremente"
         />
       </div>
 
