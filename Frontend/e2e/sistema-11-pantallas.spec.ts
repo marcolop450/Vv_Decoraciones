@@ -146,20 +146,45 @@ test.describe('Sistema 11 Pantallas Figma - Eventos Vero', () => {
   })
 
   test('7. Catálogo y Cotización WhatsApp tras Publicación', async ({ page }) => {
+    await page.addInitScript(() => {
+      const state = {
+        categories: [{ id: 'cat-e2e', name: 'Bodas de Gala', color: '#D4AF37' }],
+        events: [],
+        photos: [
+          {
+            id: 'photo-e2e-1',
+            name: 'Decoración Imperial de Boda',
+            categoryId: 'cat-e2e',
+            description: 'Montaje floral de lujo con telas y luces',
+            imageUrl: 'https://images.unsplash.com/photo-1519741497674-611481863552',
+            createdAt: '2026-10-31T20:00:00.000Z',
+          },
+        ],
+        auditLogs: [],
+        config: {
+          whatsappPhone: '59177885220',
+          contactEmail: 'veronica@eventosvero.com',
+          ownerName: 'Verónica',
+          businessName: 'V.v Decoración de Eventos',
+          address: 'Santa Cruz, Bolivia',
+        },
+      }
+      localStorage.setItem('vv_decoracion_v2_clean', JSON.stringify(state))
+    })
+
     await page.goto('/catalogo')
     await expect(page).toHaveTitle(/catalogo/i)
 
     const cotizarBtns = page.getByRole('button', { name: /Cotizar por WhatsApp/i })
-    if ((await cotizarBtns.count()) > 0) {
-      await cotizarBtns.first().click()
+    await expect(cotizarBtns.first()).toBeVisible()
+    await cotizarBtns.first().click()
 
-      const modal = page.getByRole('dialog', { name: /Cotizar Decoración por WhatsApp/i })
-      await expect(modal).toBeVisible()
-      await expect(modal.getByRole('button', { name: /Consultar sin fecha/i })).toBeVisible()
+    const modal = page.getByRole('dialog', { name: /Cotizar Decoración por WhatsApp/i })
+    await expect(modal).toBeVisible()
+    await expect(modal.getByRole('button', { name: /Consultar sin fecha/i })).toBeVisible()
 
-      await modal.getByRole('button', { name: /✕/i }).click()
-      await expect(modal).toBeHidden()
-    }
+    await modal.getByRole('button', { name: /✕/i }).click()
+    await expect(modal).toBeHidden()
   })
 
   test('8. Calendario Interactivo: /admin/calendario', async ({ page }) => {
