@@ -13,11 +13,30 @@ import { AdminReportesPage } from './pages/admin/AdminReportesPage'
 import { AdminBitacoraPage } from './pages/admin/AdminBitacoraPage'
 
 function VvRouterSwitch() {
-  const { currentRoute } = useVvApp()
+  const { currentRoute, isAuthenticated, isAuthLoading, navigate } = useVvApp()
 
   useEffect(() => {
     document.title = `V.v Decoración de Eventos — ${currentRoute}`
   }, [currentRoute])
+
+  const isAdminRoute = currentRoute.startsWith('/admin')
+
+  useEffect(() => {
+    if (!isAuthLoading && isAdminRoute && !isAuthenticated) {
+      navigate('/login')
+    }
+  }, [isAdminRoute, isAuthenticated, isAuthLoading, navigate])
+
+  if (isAdminRoute && !isAuthenticated) {
+    if (isAuthLoading) {
+      return (
+        <div className="min-h-screen bg-[#050505] flex items-center justify-center text-[#D4AF37]">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#D4AF37]"></div>
+        </div>
+      )
+    }
+    return <LoginPage />
+  }
 
   switch (currentRoute) {
     case '/landing':

@@ -32,7 +32,7 @@ export function AdminFotosPage() {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [categoryId, setCategoryId] = useState(
-    state.categories[0]?.id || 'cat-bodas'
+    state.categories[0]?.id || ''
   )
   const [imageUrl, setImageUrl] = useState(GALLERY_PRESET_IMAGES[0].url)
   const [statusBanner, setStatusBanner] = useState<string | null>(null)
@@ -41,7 +41,7 @@ export function AdminFotosPage() {
     setEditingPhoto(null)
     setName('')
     setDescription('')
-    setCategoryId(state.categories[0]?.id || 'cat-bodas')
+    setCategoryId(state.categories[0]?.id || '')
     setImageUrl(GALLERY_PRESET_IMAGES[0].url)
     setModalOpen(true)
   }

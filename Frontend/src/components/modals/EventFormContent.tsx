@@ -21,23 +21,23 @@ export function EventFormContent({
 
   const [name, setName] = useState(initialEvent?.name || '')
   const [clientName, setClientName] = useState(
-    initialEvent?.clientName || 'Marco Alejandro'
+    initialEvent?.clientName || ''
   )
-  const [phone, setPhone] = useState(initialEvent?.phone || '70145892')
+  const [phone, setPhone] = useState(initialEvent?.phone || '')
   const [venue, setVenue] = useState(
-    initialEvent?.venue || 'Salón Imperial Dorado'
+    initialEvent?.venue || ''
   )
   const [date, setDate] = useState(
-    initialEvent?.date || getLocalIsoDate(3)
+    initialEvent?.date || getLocalIsoDate(1)
   )
   const [categoryId, setCategoryId] = useState(
-    initialEvent?.categoryId || state.categories[0]?.id || 'cat-bodas'
+    initialEvent?.categoryId || state.categories[0]?.id || ''
   )
   const [totalPriceStr, setTotalPriceStr] = useState(
-    String(initialEvent?.totalPriceBs ?? 12000)
+    initialEvent?.totalPriceBs !== undefined ? String(initialEvent.totalPriceBs) : '0'
   )
   const [advancePriceStr, setAdvancePriceStr] = useState(
-    String(initialEvent?.advancePriceBs ?? 5000)
+    initialEvent?.advancePriceBs !== undefined ? String(initialEvent.advancePriceBs) : '0'
   )
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 

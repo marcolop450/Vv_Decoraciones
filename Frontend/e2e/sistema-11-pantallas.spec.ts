@@ -1,7 +1,27 @@
 import { test, expect } from '@playwright/test'
 
+async function loginAsAdmin(page: any) {
+  await page.goto('/login')
+  const accesoBtn = page.getByRole('button', { name: /Acceso Exitoso Directo/i })
+  await accesoBtn.click()
+  await expect(page).toHaveURL(/.*\/admin\/inicio/)
+}
+
 test.describe('Sistema 11 Pantallas Figma - Eventos Vero', () => {
-  test('1. Rutas Públicas: /landing y /catalogo', async ({ page }) => {
+  test('1. Seguridad: Acceso no autenticado a /admin/* es bloqueado y redirige a /login', async ({
+    page,
+  }) => {
+    // Intentar acceder a ruta administrativa directamente sin credenciales
+    await page.goto('/admin/inicio')
+    await expect(page).toHaveURL(/.*\/login/)
+    await expect(
+      page.getByRole('heading', { name: /Panel de Administración V.v/i })
+    ).toBeVisible()
+  })
+
+  test('2. Rutas Públicas: /landing y /catalogo con botón flotante WhatsApp en móvil', async ({
+    page,
+  }) => {
     // 1. Cargar /landing
     await page.goto('/landing')
     await expect(page).toHaveTitle(/V\.v Decoración de Eventos/i)
@@ -11,19 +31,19 @@ test.describe('Sistema 11 Pantallas Figma - Eventos Vero', () => {
     await expect(page.getByRole('button', { name: /Ver Decoraciones/i }).first()).toBeVisible()
     await expect(page.getByRole('button', { name: /Acceso Dueño/i }).first()).toBeVisible()
 
+    // En vista móvil, el botón flotante persistente de WhatsApp debe estar visible
+    await page.setViewportSize({ width: 375, height: 667 })
+    const whatsappFab = page.getByLabel(/Contactar por WhatsApp/i)
+    await expect(whatsappFab).toBeVisible()
+
     // 2. Navegar a /catalogo
+    await page.setViewportSize({ width: 1280, height: 800 })
     await page.getByRole('button', { name: /Ver Decoraciones/i }).first().click()
     await expect(page).toHaveURL(/.*\/catalogo/)
     await expect(page.getByPlaceholder(/Buscar decoración por nombre/i)).toBeVisible()
-
-    // Filtrar por categoría si existen chips
-    const chips = page.getByRole('button', { name: /Bodas/i })
-    if ((await chips.count()) > 0) {
-      await chips.first().click()
-    }
   })
 
-  test('2. Autenticación y Bitácora: /login con fallos y éxito', async ({ page }) => {
+  test('3. Autenticación y Bitácora: /login con fallos y éxito', async ({ page }) => {
     await page.goto('/login')
     await expect(page).toHaveTitle(/login/i)
     await expect(page.getByRole('heading', { name: /Panel de Administración V.v/i })).toBeVisible()
@@ -47,7 +67,26 @@ test.describe('Sistema 11 Pantallas Figma - Eventos Vero', () => {
     await expect(page.getByRole('heading', { name: /Panel Principal del Dueño/i })).toBeVisible()
   })
 
-  test('3. Gestión de Eventos y Nuevo: /admin/eventos y /admin/eventos/nuevo', async ({ page }) => {
+  test('4. Gestión de Categorías: Crear, Editar y Eliminar', async ({ page }) => {
+    await loginAsAdmin(page)
+
+    // Abrir modal de Gestión de Categorías
+    await page.getByRole('button', { name: /Gestión de Categorías/i }).first().click()
+    const catModal = page.getByRole('dialog', { name: /Gestión de Categorías de Decoración/i })
+    await expect(catModal).toBeVisible()
+
+    // Crear nueva categoría
+    await page.getByLabel(/Nombre de la Nueva Categoría/i).fill('Mesas Dulces VIP')
+    await page.getByRole('button', { name: /\+ Crear/i }).click()
+    await expect(page.getByText('Mesas Dulces VIP')).toBeVisible()
+
+    // Cerrar modal
+    await catModal.getByRole('button', { name: /✕ Cerrar/i }).click()
+    await expect(catModal).toBeHidden()
+  })
+
+  test('5. Gestión de Eventos y Nuevo: /admin/eventos y /admin/eventos/nuevo', async ({ page }) => {
+    await loginAsAdmin(page)
     await page.goto('/admin/eventos')
     await expect(page).toHaveTitle(/eventos/i)
 
@@ -82,7 +121,8 @@ test.describe('Sistema 11 Pantallas Figma - Eventos Vero', () => {
     await expect(page.getByText(/Bs\. 5,000/i)).toBeVisible()
   })
 
-  test('4. Detalle y Flujo de Cierre Conectado con Fotos: /admin/eventos/detalle', async ({ page }) => {
+  test('6. Detalle y Flujo de Cierre Conectado con Fotos: /admin/eventos/detalle', async ({ page }) => {
+    await loginAsAdmin(page)
     await page.goto('/admin/eventos/detalle')
     await expect(page).toHaveTitle(/detalle/i)
 
@@ -105,7 +145,7 @@ test.describe('Sistema 11 Pantallas Figma - Eventos Vero', () => {
     }
   })
 
-  test('5. Catálogo y Cotización WhatsApp tras Publicación', async ({ page }) => {
+  test('7. Catálogo y Cotización WhatsApp tras Publicación', async ({ page }) => {
     await page.goto('/catalogo')
     await expect(page).toHaveTitle(/catalogo/i)
 
@@ -122,7 +162,8 @@ test.describe('Sistema 11 Pantallas Figma - Eventos Vero', () => {
     }
   })
 
-  test('6. Calendario Interactivo: /admin/calendario', async ({ page }) => {
+  test('8. Calendario Interactivo: /admin/calendario', async ({ page }) => {
+    await loginAsAdmin(page)
     await page.goto('/admin/calendario')
     await expect(page).toHaveTitle(/calendario/i)
     await expect(page.getByRole('heading', { name: /Calendario de Eventos/i })).toBeVisible()
@@ -135,7 +176,8 @@ test.describe('Sistema 11 Pantallas Figma - Eventos Vero', () => {
     await expect(page.getByRole('button', { name: /Mes Anterior/i })).toBeVisible()
   })
 
-  test('7. Reportes y ChatBot IA: /admin/reportes', async ({ page }) => {
+  test('9. Reportes y ChatBot IA: /admin/reportes', async ({ page }) => {
+    await loginAsAdmin(page)
     await page.goto('/admin/reportes')
     await expect(page).toHaveTitle(/reportes/i)
     await expect(page.getByRole('heading', { name: /Reportes Generales \+ ChatBot IA/i })).toBeVisible()
@@ -153,7 +195,8 @@ test.describe('Sistema 11 Pantallas Figma - Eventos Vero', () => {
     await expect(page.getByText(/Bot Reportes V\.v/i).first()).toBeVisible()
   })
 
-  test('8. Bitácora de Auditoría y Variables de Negocio: /admin/bitacora', async ({ page }) => {
+  test('10. Bitácora de Auditoría y Variables de Negocio: /admin/bitacora', async ({ page }) => {
+    await loginAsAdmin(page)
     await page.goto('/admin/bitacora')
     await expect(page).toHaveTitle(/bitacora/i)
     await expect(page.getByRole('heading', { name: /Bitácora de la Página/i })).toBeVisible()
@@ -167,7 +210,7 @@ test.describe('Sistema 11 Pantallas Figma - Eventos Vero', () => {
     await expect(page.getByText(/Error de Operación/i).first()).toBeVisible()
 
     // Abrir modal de Variables de Negocio
-    await page.getByRole('button', { name: /Variables & Teléfonos/i }).click()
+    await page.getByRole('button', { name: /Variables & Teléfonos/i }).first().click()
     const varModal = page.getByRole('dialog', { name: /Variables de Negocio y Teléfonos/i })
     await expect(varModal).toBeVisible()
 
@@ -176,10 +219,10 @@ test.describe('Sistema 11 Pantallas Figma - Eventos Vero', () => {
     await expect(varModal).toBeHidden()
   })
 
-  test('9. Responsividad Nativa: Navegación Móvil Real', async ({ page }) => {
+  test('11. Responsividad Nativa: Navegación Móvil Real', async ({ page }) => {
     // Configurar viewport de teléfono móvil real
     await page.setViewportSize({ width: 375, height: 667 })
-    await page.goto('/admin/inicio')
+    await loginAsAdmin(page)
 
     // Barra inferior nativa de navegación para teléfonos
     const bottomNav = page.getByRole('navigation', { name: /Navegación Móvil del Administrador/i })

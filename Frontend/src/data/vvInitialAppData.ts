@@ -68,14 +68,7 @@ export const GALLERY_PRESET_IMAGES = [
 
 export function createInitialVvState(): VvAppDataState {
   return {
-    categories: [
-      { id: 'bodas', name: 'Bodas & Recepciones' },
-      { id: 'quinceaneros', name: 'XV Años & Quinceañeros' },
-      { id: 'cotillon-vip', name: 'Cotillón VIP & Hora Loca' },
-      { id: 'corporativos', name: 'Eventos Corporativos' },
-      { id: 'cumpleanos', name: 'Cumpleaños & Fiestas Privadas' },
-      { id: 'graduaciones', name: 'Graduaciones & Proms' },
-    ],
+    categories: [],
     photos: [],
     events: [],
     bitacora: [],

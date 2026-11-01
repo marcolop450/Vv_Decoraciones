@@ -53,6 +53,8 @@ export type BitacoraActionType =
   | 'Eliminar Evento'
   | 'Evento Completado'
   | 'Crear Categoría'
+  | 'Editar Categoría'
+  | 'Eliminar Categoría'
   | 'Error de Operación'
   | 'Logout'
 

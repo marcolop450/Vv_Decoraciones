@@ -5,7 +5,7 @@ import { WhatsAppQuoteModal } from '../modals/WhatsAppQuoteModal'
 import { VvButton, VvHeading } from '../ui/VvPrimitives'
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {
-  const { currentRoute, navigate, isMobileView } = useVvApp()
+  const { currentRoute, navigate, isMobileView, state } = useVvApp()
 
   return (
     <div className="min-h-screen vv-bg-base vv-text-primary flex flex-col">
@@ -115,6 +115,21 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </footer>
+
+      {/* Botón Flotante Persistente de WhatsApp en Móvil */}
+      <aside aria-label="Contacto directo por WhatsApp" className="md:hidden fixed bottom-6 right-6 z-40">
+        <a
+          href={`https://wa.me/${state.config?.whatsappPhone || '59177885220'}?text=${encodeURIComponent('Hola V.v Decoración, deseo consultar información sobre sus servicios de decoración de eventos.')}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-14 h-14 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center shadow-2xl border-2 border-amber-400/70 active:scale-95 transition-transform"
+          aria-label="Contactar por WhatsApp"
+        >
+          <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+          </svg>
+        </a>
+      </aside>
 
       <WhatsAppQuoteModal />
     </div>

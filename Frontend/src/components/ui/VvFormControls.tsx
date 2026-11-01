@@ -151,8 +151,8 @@ export function CategorySelectorWithInlineCreate({
   const [newCategoryName, setNewCategoryName] = useState('')
   const [feedback, setFeedback] = useState<string | null>(null)
 
-  const handleCreateCategory = () => {
-    const created = addCategory(newCategoryName)
+  const handleCreateCategory = async () => {
+    const created = await addCategory(newCategoryName)
     if (!created) return
     onSelectCategory(created.id)
     setNewCategoryName('')
@@ -177,19 +177,25 @@ export function CategorySelectorWithInlineCreate({
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {state.categories.map((cat) => {
-          const isSelected = cat.id === selectedCategoryId
-          return (
-            <VvButton
-              key={cat.id}
-              size="sm"
-              variant={isSelected ? 'gold' : 'subtle'}
-              onClick={() => onSelectCategory(cat.id)}
-            >
-              {cat.name}
-            </VvButton>
-          )
-        })}
+        {state.categories.length === 0 ? (
+          <p className="text-xs vv-text-secondary italic py-1">
+            No hay categorías creadas aún. Pulsa &ldquo;+ Nueva Categoría&rdquo; para registrar la primera.
+          </p>
+        ) : (
+          state.categories.map((cat) => {
+            const isSelected = cat.id === selectedCategoryId
+            return (
+              <VvButton
+                key={cat.id}
+                size="sm"
+                variant={isSelected ? 'gold' : 'subtle'}
+                onClick={() => onSelectCategory(cat.id)}
+              >
+                {cat.name}
+              </VvButton>
+            )
+          })
+        )}
       </div>
 
       {isCreatingNew && (

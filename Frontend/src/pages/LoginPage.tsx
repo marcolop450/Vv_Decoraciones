@@ -16,18 +16,18 @@ export function LoginPage() {
   const [password, setPassword] = useState('20042008')
   const [errorAlert, setErrorAlert] = useState<string | null>(null)
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setErrorAlert(null)
-    const result = loginOwner(email, password)
+    const result = await loginOwner(email, password)
     if (!result.ok) {
       setErrorAlert(result.message)
     }
   }
 
-  const handleSimulateFailedAttempt = () => {
+  const handleSimulateFailedAttempt = async () => {
     setEmail('admin@vvdecoracion.com')
     setPassword('error')
-    const result = loginOwner('admin@vvdecoracion.com', 'error')
+    const result = await loginOwner('admin@vvdecoracion.com', 'error')
     if (!result.ok) {
       setErrorAlert(result.message)
     }
@@ -125,10 +125,10 @@ export function LoginPage() {
               <VvButton
                 size="sm"
                 variant="outline"
-                onClick={() => {
+                onClick={async () => {
                   setEmail('veronica@gmail.com')
                   setPassword('20042008')
-                  loginOwner('veronica@gmail.com', '20042008')
+                  await loginOwner('veronica@gmail.com', '20042008')
                 }}
               >
                 Acceso Exitoso Directo

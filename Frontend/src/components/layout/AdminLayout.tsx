@@ -4,6 +4,7 @@ import { useVvApp } from '../../context/VvAppContext'
 import type { AppRoute } from '../../types/vv-app'
 import { VvBadge, VvButton, VvHeading } from '../ui/VvPrimitives'
 import { BusinessConfigModal } from '../modals/BusinessConfigModal'
+import { CategoryManagementModal } from '../modals/CategoryManagementModal'
 
 interface NavItem {
   route: AppRoute
@@ -101,6 +102,7 @@ export function AdminLayout({
   const { currentRoute, navigate, logoutOwner } = useVvApp()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [configModalOpen, setConfigModalOpen] = useState(false)
+  const [catModalOpen, setCatModalOpen] = useState(false)
 
   const isRouteActive = (itemRoute: AppRoute) => {
     if (
@@ -169,6 +171,27 @@ export function AdminLayout({
         </nav>
 
         <div className="p-4 border-t vv-border-gold space-y-2">
+          <VvButton
+            size="sm"
+            variant="outline"
+            className="w-full justify-start gap-2"
+            onClick={() => setCatModalOpen(true)}
+          >
+            <svg
+              className="w-4 h-4 shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+            </svg>
+            <span>Gestión de Categorías</span>
+          </VvButton>
+
           <VvButton
             size="sm"
             variant="outline"
@@ -283,6 +306,22 @@ export function AdminLayout({
           <button
             type="button"
             onClick={() => {
+              setCatModalOpen(true)
+              setMobileMenuOpen(false)
+            }}
+            className="w-full flex items-center gap-2.5 p-2 rounded-xl text-xs vv-text-gold-light hover:vv-bg-subtle text-left"
+          >
+            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+            </svg>
+            <span>Gestión de Categorías</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
               setConfigModalOpen(true)
               setMobileMenuOpen(false)
             }}
@@ -338,7 +377,7 @@ export function AdminLayout({
       {/* Barra inferior de navegación nativa para Móviles (<= 768px) */}
       <nav
         aria-label="Navegación Móvil del Administrador"
-        className="md:hidden fixed bottom-0 inset-x-0 z-30 vv-bg-surface/95 backdrop-blur-md border-t vv-border-gold px-2 py-2 grid grid-cols-5 gap-1 shadow-lg"
+        className="md:hidden fixed bottom-0 inset-x-0 z-30 vv-bg-surface/95 backdrop-blur-md border-t vv-border-gold px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] grid grid-cols-5 gap-1 shadow-lg"
       >
         {MOBILE_BOTTOM_NAV_ITEMS.map((item) => {
           const active = isRouteActive(item.route)
@@ -350,7 +389,7 @@ export function AdminLayout({
                 setMobileMenuOpen(false)
                 navigate(item.route)
               }}
-              className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all ${
+              className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all ${
                 active
                   ? 'vv-text-gold-light font-bold bg-amber-400/10'
                   : 'vv-text-muted hover:vv-text-secondary'
@@ -370,6 +409,11 @@ export function AdminLayout({
       <BusinessConfigModal
         isOpen={configModalOpen}
         onClose={() => setConfigModalOpen(false)}
+      />
+
+      <CategoryManagementModal
+        isOpen={catModalOpen}
+        onClose={() => setCatModalOpen(false)}
       />
     </div>
   )
