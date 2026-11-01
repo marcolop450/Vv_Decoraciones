@@ -2,10 +2,8 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Acceso Administrativo y Panel del Dueño', () => {
   test('Inicio de sesión en el portal del dueño', async ({ page }) => {
-    await page.goto('/')
-
-    // Navegar a Acceso Dueño
-    await page.getByRole('button', { name: /Acceso Dueño/i }).first().click()
+    // Navegar directamente a /login
+    await page.goto('/login')
 
     // Verificar pantalla de login
     await expect(page.getByRole('heading', { name: /Panel de Administración V.v/i })).toBeVisible()

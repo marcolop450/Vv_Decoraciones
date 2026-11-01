@@ -61,15 +61,6 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             >
               Ver Decoraciones
             </VvButton>
-            <VvButton
-              size="sm"
-              variant="ghost"
-              onClick={() => navigate('/login')}
-              className="text-xs opacity-80 hover:opacity-100"
-              title="Acceso privado para el propietario"
-            >
-              Acceso Dueño
-            </VvButton>
           </nav>
         </div>
       </header>
@@ -104,13 +95,6 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               onClick={() => navigate('/catalogo')}
             >
               Catálogo
-            </VvButton>
-            <VvButton
-              size="sm"
-              variant="ghost"
-              onClick={() => navigate('/login')}
-            >
-              Acceso Dueño
             </VvButton>
           </div>
         </div>

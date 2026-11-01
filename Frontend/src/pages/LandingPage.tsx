@@ -1,12 +1,10 @@
 import React, { useMemo, useState } from 'react'
-import vvLogo from '../assets/vv-logo.png'
 import { PublicLayout } from '../components/layout/PublicLayout'
 import {
   VvBadge,
   VvButton,
   VvCard,
   VvHeading,
-  VvOrnamentDivider,
 } from '../components/ui/VvPrimitives'
 import { useVvApp } from '../context/VvAppContext'
 
@@ -35,149 +33,126 @@ export function LandingPage() {
     return list.slice(0, 3)
   }, [state.photos, shuffleSeed])
 
+  const targetWhatsAppPhone = (state.config?.whatsappPhone || '59177885220').replace(/[^0-9]/g, '')
+
+  const handleGeneralWhatsAppQuote = () => {
+    const text = encodeURIComponent(
+      'Hola V.v Decoración, deseo consultar disponibilidad y cotizar una decoración para mi evento.'
+    )
+    window.open(
+      `https://wa.me/${targetWhatsAppPhone}?text=${text}`,
+      '_blank',
+      'noopener,noreferrer'
+    )
+  }
+
   return (
     <PublicLayout>
-      {/* HERO SECTION PRINCIPAL - RESPONSIVO NATIVO */}
-      <section className="relative overflow-hidden border-b vv-border-gold">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 md:py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            <div className="lg:col-span-7 space-y-4 sm:space-y-6 text-center lg:text-left">
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2">
-                <VvBadge variant="gold">Alta Decoración & Montajes</VvBadge>
-                <VvBadge variant="info">Cotillón VIP de Gala</VvBadge>
-              </div>
+      {/* HERO SECTION PRINCIPAL - GALA NOCTURNA LIMPIA Y CENTRADA */}
+      <section className="relative overflow-hidden border-b vv-border-gold py-14 sm:py-20 md:py-28">
+        {/* Resplandor ambiental dorado suave de fondo */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none opacity-40"
+          style={{
+            background:
+              'radial-gradient(ellipse 65% 55% at 50% 45%, rgba(212, 175, 55, 0.18) 0%, rgba(5, 5, 5, 0) 75%)',
+          }}
+        />
 
-              <div className="vv-font-script text-2xl sm:text-4xl vv-text-gold-light">
-                {state.config?.brandSubtitle || 'Decoración de eventos y cotillón'}
-              </div>
-
-              <VvHeading level={1} variant="serif" metallic>
-                {state.config?.businessName || 'V.v Decoración y Organización de Eventos'}
-              </VvHeading>
-
-              <p className="vv-text-secondary text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                Transformamos salones, jardines y recepciones en escenarios de gala
-                inolvidables. Especialistas en montaje floral de lujo, iluminación
-                cálida, mobiliario imperial y cotillón personalizado para{' '}
-                <strong className="vv-text-primary">
-                  Bodas, Quinceañeros, Cumpleaños y Galas Corporativas
-                </strong>.
-              </p>
-
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-2">
-                <VvButton
-                  size="lg"
-                  variant="gold"
-                  onClick={() => navigate('/catalogo')}
-                  className="w-full sm:w-auto"
-                >
-                  Explorar Catálogo de Decoraciones
-                </VvButton>
-                <VvButton
-                  size="lg"
-                  variant="outline"
-                  onClick={() => {
-                    if (randomThreePhotos[0]) {
-                      openWhatsAppQuote(randomThreePhotos[0])
-                    } else {
-                      navigate('/catalogo')
-                    }
-                  }}
-                  className="w-full sm:w-auto"
-                >
-                  Cotizar Evento por WhatsApp
-                </VvButton>
-              </div>
-
-              <div className="grid grid-cols-3 gap-3 pt-4 border-t vv-border-gold max-w-lg mx-auto lg:mx-0 text-center">
-                <div>
-                  <div className="vv-font-serif text-xl sm:text-2xl font-bold vv-text-gold-light">
-                    100%
-                  </div>
-                  <div className="text-[11px] sm:text-xs vv-text-muted">Montajes a Medida</div>
-                </div>
-                <div>
-                  <div className="vv-font-serif text-xl sm:text-2xl font-bold vv-text-gold-light">
-                    {state.categories.length} Líneas
-                  </div>
-                  <div className="text-[11px] sm:text-xs vv-text-muted">Categorías de Gala</div>
-                </div>
-                <div>
-                  <div className="vv-font-serif text-xl sm:text-2xl font-bold vv-text-gold-light">
-                    Directo
-                  </div>
-                  <div className="text-[11px] sm:text-xs vv-text-muted">Atención por WhatsApp</div>
-                </div>
-              </div>
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 sm:space-y-8">
+          <div className="space-y-3">
+            <div className="vv-font-script text-3xl sm:text-5xl md:text-6xl vv-text-gold-light tracking-wide">
+              {state.config?.brandSubtitle ||
+                'Gala Nocturna: Bodas, Quinceañeros, Cumpleaños y Eventos Corporativos'}
             </div>
 
-            <div className="lg:col-span-5 flex flex-col items-center">
-              <VvCard
-                variant="gold-highlight"
-                className="p-5 sm:p-6 w-full max-w-md space-y-4"
-              >
-                <div className="aspect-square rounded-2xl vv-bg-base border vv-border-gold-strong p-4 sm:p-5 flex items-center justify-center">
-                  <img
-                    src={vvLogo}
-                    alt="Emblema V.v Decoración de eventos y cotillón"
-                    className="w-full h-full object-contain rounded-xl"
-                  />
-                </div>
-                <div className="text-center space-y-1">
-                  <div className="vv-font-serif text-base sm:text-lg font-semibold vv-text-gold-light">
-                    Sello de Excelencia en Cada Detalle
-                  </div>
-                  <p className="text-xs vv-text-secondary">
-                    Selecciona tu decoración favorita y consulta disponibilidad de fecha al instante.
-                  </p>
-                </div>
-              </VvCard>
-            </div>
+            <VvHeading
+              level={1}
+              variant="serif"
+              metallic
+              className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight"
+            >
+              {state.config?.businessName ||
+                'V.v Decoración de eventos y cotillón'}
+            </VvHeading>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 pt-2 max-w-md sm:max-w-none mx-auto">
+            <VvButton
+              size="lg"
+              variant="gold"
+              onClick={() => navigate('/catalogo')}
+              className="w-full sm:w-auto shadow-lg hover:shadow-[0_0_24px_rgba(212,175,55,0.4)] transition-all duration-300"
+            >
+              Explorar Catálogo de Decoraciones
+            </VvButton>
+            <VvButton
+              size="lg"
+              variant="outline"
+              onClick={() => {
+                if (randomThreePhotos[0]) {
+                  openWhatsAppQuote(randomThreePhotos[0])
+                } else {
+                  handleGeneralWhatsAppQuote()
+                }
+              }}
+              className="w-full sm:w-auto hover:vv-bg-gold-surface transition-all duration-300"
+            >
+              Cotizar Evento por WhatsApp
+            </VvButton>
           </div>
         </div>
       </section>
 
-      {/* SECCIÓN MUESTRA ALEATORIA DE DECORACIONES */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-6 sm:space-y-9">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div>
-            <VvBadge variant="gold">Selección Destacada del Catálogo</VvBadge>
-            <VvHeading level={2} variant="serif" className="mt-2">
-              Muestra de Decoraciones
-            </VvHeading>
-            <p className="text-sm vv-text-secondary mt-1">
-              Ambientaciones de gala y solicitud de cotización directa por WhatsApp.
-            </p>
-          </div>
-
+      {/* SECCIÓN MUESTRA DE DECORACIONES */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-8">
+        <div className="text-center space-y-2">
+          <VvHeading
+            level={2}
+            variant="serif"
+            className="text-2xl sm:text-4xl font-bold"
+          >
+            Muestra de Decoraciones
+          </VvHeading>
           {state.photos.length > 3 && (
-            <VvButton
-              size="sm"
-              variant="subtle"
-              onClick={() => setShuffleSeed((s) => s + 1)}
-            >
-              ↻ Mostrar otra selección aleatoria
-            </VvButton>
+            <div className="pt-1">
+              <VvButton
+                size="sm"
+                variant="subtle"
+                onClick={() => setShuffleSeed((s) => s + 1)}
+              >
+                ↻ Mostrar otra selección aleatoria
+              </VvButton>
+            </div>
           )}
         </div>
 
-        <VvOrnamentDivider label="Ambientes de Gala" />
-
         {randomThreePhotos.length === 0 ? (
-          <VvCard variant="surface" className="p-8 sm:p-12 text-center space-y-4 max-w-2xl mx-auto">
-            <VvHeading level={3} variant="serif">
+          <VvCard
+            variant="surface"
+            className="p-8 sm:p-14 text-center space-y-5 max-w-xl mx-auto border vv-border-gold"
+          >
+            <VvHeading
+              level={3}
+              variant="serif"
+              className="text-xl sm:text-2xl"
+            >
               Catálogo en Preparación
             </VvHeading>
-            <p className="text-xs sm:text-sm vv-text-secondary leading-relaxed">
+            <p className="text-xs sm:text-sm vv-text-secondary leading-relaxed max-w-md mx-auto">
               Actualmente se están preparando las fotografías de alta resolución para esta galería. Puedes consultar fechas y cotizar tu evento directamente a través de WhatsApp.
             </p>
-            <VvButton
-              size="md"
-              variant="gold"
-              onClick={() => navigate('/catalogo')}
-            >
-              Consultar al Dueño
-            </VvButton>
+            <div>
+              <VvButton
+                size="md"
+                variant="gold"
+                onClick={handleGeneralWhatsAppQuote}
+                className="shadow-md hover:shadow-[0_0_20px_rgba(212,175,55,0.35)] transition-all"
+              >
+                Cotizar por WhatsApp
+              </VvButton>
+            </div>
           </VvCard>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
@@ -185,14 +160,14 @@ export function LandingPage() {
               <VvCard
                 key={photo.id}
                 variant="surface"
-                className="overflow-hidden flex flex-col justify-between hover:vv-border-gold-strong"
+                className="overflow-hidden flex flex-col justify-between hover:border-[#d4af37]/70 transition-all duration-300 hover:-translate-y-1"
               >
                 <div>
                   <div className="relative h-56 overflow-hidden">
                     <img
                       src={photo.imageUrl}
                       alt={photo.name}
-                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                     <div className="absolute top-3 left-3">
@@ -217,7 +192,7 @@ export function LandingPage() {
                     size="md"
                     variant="gold"
                     onClick={() => openWhatsAppQuote(photo)}
-                    className="w-full"
+                    className="w-full shadow-sm hover:shadow-[0_0_16px_rgba(212,175,55,0.3)] transition-all"
                   >
                     Cotizar por WhatsApp
                   </VvButton>
@@ -228,7 +203,7 @@ export function LandingPage() {
         )}
 
         {state.photos.length > 0 && (
-          <div className="pt-4 flex flex-col items-center justify-center text-center space-y-3">
+          <div className="pt-4 flex flex-col items-center justify-center text-center">
             <VvButton
               size="lg"
               variant="outline"

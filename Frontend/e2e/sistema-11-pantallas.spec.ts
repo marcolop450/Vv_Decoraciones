@@ -29,7 +29,7 @@ test.describe('Sistema 11 Pantallas Figma - Eventos Vero', () => {
 
     // Navbar con accesos principales
     await expect(page.getByRole('button', { name: /Ver Decoraciones/i }).first()).toBeVisible()
-    await expect(page.getByRole('button', { name: /Acceso Dueño/i }).first()).toBeVisible()
+    await expect(page.getByRole('button', { name: /Explorar Catálogo de Decoraciones/i })).toBeVisible()
 
     // En vista móvil, el botón flotante persistente de WhatsApp debe estar visible
     await page.setViewportSize({ width: 375, height: 667 })
