@@ -196,11 +196,11 @@ export function EventFormContent({
         onSelectCategory={setCategoryId}
       />
 
-      <div className="pt-2 flex items-center justify-end gap-3 border-t vv-border-gold">
-        <VvButton size="md" variant="ghost" onClick={onCancel}>
+      <div className="pt-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2.5 border-t vv-border-gold">
+        <VvButton size="md" variant="ghost" onClick={onCancel} className="order-2 sm:order-1 w-full sm:w-auto">
           Cancelar
         </VvButton>
-        <VvButton size="md" variant="gold" onClick={handleSubmit}>
+        <VvButton size="md" variant="gold" onClick={handleSubmit} className="order-1 sm:order-2 w-full sm:w-auto shadow-sm">
           {initialEvent ? 'Guardar Cambios' : 'Registrar Evento'}
         </VvButton>
       </div>

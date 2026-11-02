@@ -92,11 +92,13 @@ export function AdminLayout({
   title,
   subtitle,
   headerActions,
+  hideBottomNav = false,
   children,
 }: {
   title: string
   subtitle?: string
   headerActions?: React.ReactNode
+  hideBottomNav?: boolean
   children: React.ReactNode
 }) {
   const { currentRoute, navigate, logoutOwner } = useVvApp()
@@ -233,8 +235,8 @@ export function AdminLayout({
         </div>
       </aside>
 
-      {/* Header móvil nativo (visible solo en < 768px) */}
-      <header className="md:hidden sticky top-0 z-30 vv-bg-glass border-b vv-border-gold px-4 py-2.5 flex items-center justify-between gap-2">
+      {/* Header móvil nativo (visible solo en < 768px) - Limpio, sin botones apiñados */}
+      <header className="md:hidden sticky top-0 z-30 vv-bg-glass border-b vv-border-gold px-4 py-2.5 flex items-center justify-between gap-3">
         <div
           role="button"
           tabIndex={0}
@@ -245,7 +247,7 @@ export function AdminLayout({
               navigate('/admin/inicio')
             }
           }}
-          className="flex items-center gap-2 cursor-pointer min-w-0"
+          className="flex items-center gap-2.5 cursor-pointer min-w-0"
         >
           <img
             src={vvLogo}
@@ -259,17 +261,14 @@ export function AdminLayout({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
-          {headerActions}
-          <button
-            type="button"
-            aria-label="☰ Más"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="h-8 px-2.5 rounded-lg border vv-border-gold vv-bg-elevated vv-text-secondary hover:vv-text-primary text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
-          >
-            {mobileMenuOpen ? '✕' : '☰ Más'}
-          </button>
-        </div>
+        <button
+          type="button"
+          aria-label="☰ Más"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="h-8 px-3 rounded-lg border vv-border-gold vv-bg-elevated vv-text-secondary hover:vv-text-primary text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+        >
+          {mobileMenuOpen ? '✕' : '☰ Más'}
+        </button>
       </header>
 
       {/* Menú desplegable móvil */}
@@ -378,43 +377,47 @@ export function AdminLayout({
         {/* Cuerpo de página */}
         <main
           key={currentRoute}
-          className="flex-1 p-4 sm:p-6 md:p-8 pb-24 md:pb-8 max-w-7xl w-full mx-auto vv-animate-page"
+          className={`flex-1 p-4 sm:p-6 md:p-8 max-w-7xl w-full mx-auto vv-animate-page ${
+            hideBottomNav ? 'pb-8' : 'pb-24 md:pb-8'
+          }`}
         >
           {children}
         </main>
       </div>
 
       {/* Barra inferior de navegación nativa para Móviles (<= 768px) */}
-      <nav
-        aria-label="Navegación Móvil del Administrador"
-        className="md:hidden fixed bottom-0 inset-x-0 z-30 vv-bg-surface/95 backdrop-blur-md border-t vv-border-gold px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] grid grid-cols-5 gap-1 shadow-lg"
-      >
-        {MOBILE_BOTTOM_NAV_ITEMS.map((item) => {
-          const active = isRouteActive(item.route)
-          return (
-            <button
-              key={item.route}
-              type="button"
-              onClick={() => {
-                setMobileMenuOpen(false)
-                navigate(item.route)
-              }}
-              className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all ${
-                active
-                  ? 'vv-text-gold-light font-bold bg-amber-400/10'
-                  : 'vv-text-muted hover:vv-text-secondary'
-              }`}
-            >
-              <span className={active ? 'vv-text-gold' : 'currentColor'}>
-                {item.icon}
-              </span>
-              <span className="text-[10px] mt-1 leading-none truncate max-w-full">
-                {item.shortLabel}
-              </span>
-            </button>
-          )
-        })}
-      </nav>
+      {!hideBottomNav && (
+        <nav
+          aria-label="Navegación Móvil del Administrador"
+          className="md:hidden fixed bottom-0 inset-x-0 z-30 vv-bg-surface/95 backdrop-blur-md border-t vv-border-gold px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] grid grid-cols-5 gap-1 shadow-lg"
+        >
+          {MOBILE_BOTTOM_NAV_ITEMS.map((item) => {
+            const active = isRouteActive(item.route)
+            return (
+              <button
+                key={item.route}
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false)
+                  navigate(item.route)
+                }}
+                className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all ${
+                  active
+                    ? 'vv-text-gold-light font-bold bg-amber-400/10'
+                    : 'vv-text-muted hover:vv-text-secondary'
+                }`}
+              >
+                <span className={active ? 'vv-text-gold' : 'currentColor'}>
+                  {item.icon}
+                </span>
+                <span className="text-[10px] mt-1 leading-none truncate max-w-full">
+                  {item.shortLabel}
+                </span>
+              </button>
+            )
+          })}
+        </nav>
+      )}
 
       <BusinessConfigModal
         isOpen={configModalOpen}

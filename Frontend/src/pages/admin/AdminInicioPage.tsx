@@ -116,18 +116,6 @@ export function AdminInicioPage() {
         </VvButton>
       }
     >
-      {/* Floating Action Button (FAB) on mobile */}
-      {isMobileView && (
-        <button
-          type="button"
-          onClick={() => navigate('/admin/eventos/nuevo', { editEventId: null })}
-          className="fixed bottom-20 right-5 z-40 w-14 h-14 rounded-full vv-bg-gold-gradient vv-text-on-gold flex items-center justify-center text-3xl font-light shadow-[0_8px_25px_rgba(212,175,55,0.4)] border-2 border-[#fff3b0] active:scale-90 transition-transform"
-          aria-label="Registrar nuevo evento"
-        >
-          +
-        </button>
-      )}
-
       {isMobileView ? (
         <div className="space-y-5">
           <div className="grid grid-cols-2 gap-3">

@@ -49,77 +49,77 @@ export function AdminEventosPage() {
           size="md"
           variant="gold"
           onClick={handleOpenCreateEvent}
-          className="hidden md:flex whitespace-nowrap"
+          className="whitespace-nowrap"
         >
           + Registrar Evento
         </VvButton>
       }
     >
-      {/* Floating Action Button (FAB) on mobile */}
-      {isMobileView && (
-        <button
-          type="button"
-          onClick={handleOpenCreateEvent}
-          className="fixed bottom-20 right-5 z-40 w-14 h-14 rounded-full vv-bg-gold-gradient vv-text-on-gold flex items-center justify-center text-3xl font-light shadow-[0_8px_25px_rgba(212,175,55,0.4)] border-2 border-[#fff3b0] active:scale-90 transition-transform"
-          aria-label="Registrar nuevo evento"
-        >
-          +
-        </button>
-      )}
-
       {bannerMessage && (
         <div className="p-3.5 rounded-xl vv-badge-success text-xs font-medium">
           {bannerMessage}
         </div>
       )}
 
-      {/* PESTAÑAS (TABS): Control segmentado unido ("Junto") */}
-      <div className="flex p-1 rounded-xl vv-bg-surface border vv-border-gold max-w-md">
-        <button
-          type="button"
-          onClick={() => setActiveTab('activo')}
-          className={`flex-1 py-2 px-3 text-xs font-semibold rounded-lg transition-all ${
-            activeTab === 'activo'
-              ? 'vv-bg-gold-gradient vv-text-on-gold shadow-sm'
-              : 'vv-text-muted hover:vv-text-secondary'
-          }`}
-        >
-          Eventos Activos ({activeEvents.length})
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('completado')}
-          className={`flex-1 py-2 px-3 text-xs font-semibold rounded-lg transition-all ${
-            activeTab === 'completado'
-              ? 'vv-bg-gold-gradient vv-text-on-gold shadow-sm'
-              : 'vv-text-muted hover:vv-text-secondary'
-          }`}
-        >
-          Eventos Realizados ({completedEvents.length})
-        </button>
-      </div>
-
-      {/* LISTA / GRILLA DE TARJETAS DE EVENTOS */}
-      {displayedEvents.length === 0 ? (
-        <VvCard variant="surface" className="p-10 text-center space-y-4 max-w-md mx-auto">
-          <VvHeading level={3} variant="serif">
-            No hay eventos en esta pestaña
-          </VvHeading>
-          <p className="text-xs vv-text-secondary leading-relaxed">
-            Usa el botón &ldquo;+ Registrar Evento&rdquo; para registrar una nueva celebración y agendar su fecha.
-          </p>
-          <div>
-            <VvButton size="sm" variant="gold" onClick={handleOpenCreateEvent}>
-              + Registrar Primer Evento
-            </VvButton>
+      <div className="space-y-3">
+        {/* Barra de control: Tabs de Eventos + Botón Registrar en móvil y escritorio */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+          <div className="flex p-1 rounded-xl vv-bg-surface border vv-border-gold flex-1 sm:max-w-md">
+            <button
+              type="button"
+              onClick={() => setActiveTab('activo')}
+              className={`flex-1 py-2 px-3 text-xs font-semibold rounded-lg transition-all ${
+                activeTab === 'activo'
+                  ? 'vv-bg-gold-gradient vv-text-on-gold shadow-sm'
+                  : 'vv-text-muted hover:vv-text-secondary'
+              }`}
+            >
+              Eventos Activos ({activeEvents.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('completado')}
+              className={`flex-1 py-2 px-3 text-xs font-semibold rounded-lg transition-all ${
+                activeTab === 'completado'
+                  ? 'vv-bg-gold-gradient vv-text-on-gold shadow-sm'
+                  : 'vv-text-muted hover:vv-text-secondary'
+              }`}
+            >
+              Eventos Realizados ({completedEvents.length})
+            </button>
           </div>
-        </VvCard>
-      ) : (
-        <div
-          className={`grid grid-cols-1 ${
-            isMobileView ? 'gap-5' : 'lg:grid-cols-2 gap-6'
-          }`}
-        >
+
+          <VvButton
+            size="md"
+            variant="gold"
+            onClick={handleOpenCreateEvent}
+            className="w-full sm:w-auto shadow-sm"
+          >
+            + Registrar Evento
+          </VvButton>
+        </div>
+
+        {/* LISTA / GRILLA DE TARJETAS DE EVENTOS - Unificada sin separación excesiva */}
+        {displayedEvents.length === 0 ? (
+          <div className="p-8 sm:p-10 rounded-2xl vv-bg-surface border vv-border-gold text-center space-y-3">
+            <VvHeading level={3} variant="serif" className="text-lg sm:text-xl">
+              No hay eventos en esta pestaña
+            </VvHeading>
+            <p className="text-xs vv-text-secondary leading-relaxed max-w-sm mx-auto">
+              Usa el botón &ldquo;+ Registrar Evento&rdquo; para registrar una nueva celebración y agendar su fecha.
+            </p>
+            <div>
+              <VvButton size="sm" variant="gold" onClick={handleOpenCreateEvent}>
+                + Registrar Primer Evento
+              </VvButton>
+            </div>
+          </div>
+        ) : (
+          <div
+            className={`grid grid-cols-1 ${
+              isMobileView ? 'gap-4' : 'lg:grid-cols-2 gap-5'
+            }`}
+          >
           {displayedEvents.map((ev) => {
             const pendingBs = Math.max(0, ev.totalPriceBs - ev.advancePriceBs)
             return (
@@ -216,6 +216,7 @@ export function AdminEventosPage() {
           })}
         </div>
       )}
+      </div>
     </AdminLayout>
   )
 }
