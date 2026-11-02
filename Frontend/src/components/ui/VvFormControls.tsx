@@ -150,6 +150,7 @@ export function CategorySelectorWithInlineCreate({
   const [isCreatingNew, setIsCreatingNew] = useState(false)
   const [newCategoryName, setNewCategoryName] = useState('')
   const [feedback, setFeedback] = useState<string | null>(null)
+  const selectId = React.useId()
 
   const handleCreateCategory = async () => {
     const created = await addCategory(newCategoryName)
@@ -157,69 +158,92 @@ export function CategorySelectorWithInlineCreate({
     onSelectCategory(created.id)
     setNewCategoryName('')
     setIsCreatingNew(false)
-    setFeedback(`Categoría "${created.name}" creada y seleccionada`)
+    setFeedback(`Categoría "${created.name}" creada`)
     setTimeout(() => setFeedback(null), 2500)
   }
 
   return (
-    <div className="space-y-2.5 p-3.5 rounded-xl vv-bg-elevated border vv-border-gold">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="text-xs font-semibold uppercase tracking-wider vv-text-secondary">
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between">
+        <label
+          htmlFor={selectId}
+          className="block text-xs font-semibold uppercase tracking-wider vv-text-secondary"
+        >
           {label} <span className="vv-text-gold">*</span>
-        </span>
-        <VvButton
-          size="sm"
-          variant={isCreatingNew ? 'ghost' : 'outline'}
+        </label>
+        <button
+          type="button"
           onClick={() => setIsCreatingNew(!isCreatingNew)}
+          className="text-xs vv-text-gold-light hover:underline font-medium transition-colors"
         >
           {isCreatingNew ? 'Cancelar' : '+ Nueva Categoría'}
-        </VvButton>
+        </button>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {state.categories.length === 0 ? (
-          <p className="text-xs vv-text-secondary italic py-1">
-            No hay categorías creadas aún. Pulsa &ldquo;+ Nueva Categoría&rdquo; para registrar la primera.
-          </p>
-        ) : (
-          state.categories.map((cat) => {
-            const isSelected = cat.id === selectedCategoryId
-            return (
-              <VvButton
+      <div className="relative">
+        <select
+          id={selectId}
+          aria-label={label}
+          value={selectedCategoryId}
+          onChange={(e) => onSelectCategory(e.target.value)}
+          className="w-full px-3.5 py-2.5 rounded-xl vv-bg-subtle border vv-border-gold vv-text-primary text-sm focus:outline-none focus:border-[#F3D37A] transition-colors appearance-none pr-10 cursor-pointer"
+        >
+          {state.categories.length === 0 ? (
+            <option value="" disabled>
+              Sin categorías disponibles
+            </option>
+          ) : (
+            state.categories.map((cat) => (
+              <option
                 key={cat.id}
-                size="sm"
-                variant={isSelected ? 'gold' : 'subtle'}
-                onClick={() => onSelectCategory(cat.id)}
+                value={cat.id}
+                className="bg-[#121217] text-[#F9F6F0]"
               >
                 {cat.name}
-              </VvButton>
-            )
-          })
-        )}
+              </option>
+            ))
+          )}
+        </select>
+        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-[#D4AF37]">
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </div>
       </div>
 
       {isCreatingNew && (
-        <div className="pt-2 border-t vv-border-gold space-y-2">
-          <div className="text-xs vv-text-gold-light font-medium">
-            Registrar nueva categoría sin salir del formulario:
-          </div>
-          <div className="flex flex-col sm:flex-row gap-2">
-            <input
-              type="text"
-              value={newCategoryName}
-              onChange={(e) => setNewCategoryName(e.target.value)}
-              placeholder="Ej. Aniversarios, Graduaciones, Baby Shower..."
-              className="flex-1 px-3 py-2 rounded-lg vv-bg-subtle border vv-border-gold-strong vv-text-primary text-xs focus:outline-none"
-            />
-            <VvButton
-              size="sm"
-              variant="gold"
-              onClick={handleCreateCategory}
-              disabled={!newCategoryName.trim()}
-            >
-              Guardar Categoría
-            </VvButton>
-          </div>
+        <div className="pt-2 flex gap-2">
+          <input
+            type="text"
+            value={newCategoryName}
+            onChange={(e) => setNewCategoryName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                handleCreateCategory()
+              }
+            }}
+            placeholder="Nombre de la nueva categoría..."
+            className="flex-1 px-3 py-2 rounded-lg vv-bg-subtle border vv-border-gold-strong vv-text-primary text-xs focus:outline-none"
+          />
+          <VvButton
+            size="sm"
+            variant="gold"
+            onClick={handleCreateCategory}
+            disabled={!newCategoryName.trim()}
+          >
+            Crear
+          </VvButton>
         </div>
       )}
 

@@ -18,8 +18,7 @@ export function AdminEventoNuevoPage() {
 
   return (
     <AdminLayout
-      title={eventToEdit ? 'Editar Evento' : 'Registrar Nuevo Evento'}
-      subtitle="Pantalla dedicada (/admin/eventos/nuevo) optimizada para registro cómodo desde dispositivos móviles o escritorio."
+      title={eventToEdit ? 'Editar Evento' : 'Crear Evento'}
       headerActions={
         <VvButton
           size="sm"
@@ -31,20 +30,6 @@ export function AdminEventoNuevoPage() {
       }
     >
       <VvCard variant="gold-highlight" className="p-5 sm:p-7 space-y-5">
-        <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b vv-border-gold">
-          <div>
-            <VvBadge variant="gold">Formulario Completo de Evento</VvBadge>
-            <VvHeading level={3} variant="serif" className="mt-1">
-              {eventToEdit
-                ? `Editando: ${eventToEdit.name}`
-                : 'Datos del Evento, Cliente y Presupuesto'}
-            </VvHeading>
-          </div>
-          <span className="text-xs vv-text-muted">
-            Se sincroniza con Calendario y Reportes
-          </span>
-        </div>
-
         <EventFormContent
           initialEvent={eventToEdit}
           onCancel={() => navigate('/admin/eventos')}

@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { AdminLayout } from '../../components/layout/AdminLayout'
-import { EventFormContent } from '../../components/modals/EventFormContent'
 import {
   VvBadge,
   VvButton,
@@ -21,9 +20,6 @@ export function AdminEventosPage() {
   } = useVvApp()
 
   const [activeTab, setActiveTab] = useState<EventLifecycleStatus>('activo')
-  const [desktopModalOpen, setDesktopModalOpen] = useState(false)
-  const [editingModalEvent, setEditingModalEvent] =
-    useState<EventRecord | null>(null)
   const [bannerMessage, setBannerMessage] = useState<string | null>(null)
 
   const activeEvents = state.events.filter((e) => e.status === 'activo')
@@ -32,21 +28,11 @@ export function AdminEventosPage() {
     activeTab === 'activo' ? activeEvents : completedEvents
 
   const handleOpenCreateEvent = () => {
-    if (isMobileView) {
-      navigate('/admin/eventos/nuevo', { editEventId: null })
-    } else {
-      setEditingModalEvent(null)
-      setDesktopModalOpen(true)
-    }
+    navigate('/admin/eventos/nuevo', { editEventId: null })
   }
 
   const handleOpenEditEvent = (ev: EventRecord) => {
-    if (isMobileView) {
-      navigate('/admin/eventos/nuevo', { editEventId: ev.id })
-    } else {
-      setEditingModalEvent(ev)
-      setDesktopModalOpen(true)
-    }
+    navigate('/admin/eventos/nuevo', { editEventId: ev.id })
   }
 
   const handleDeleteEvent = (ev: EventRecord) => {
@@ -58,57 +44,59 @@ export function AdminEventosPage() {
   return (
     <AdminLayout
       title="Administrar Eventos"
-      subtitle="Controla tus Eventos Actuales (Activos) y tus Eventos Realizados (Completados), con acceso rápido al detalle financiero."
       headerActions={
-        <div className="flex flex-wrap items-center gap-2">
-          <VvButton
-            size="sm"
-            variant="subtle"
-            onClick={() =>
-              navigate('/admin/eventos/nuevo', { editEventId: null })
-            }
-            title="Abrir vista de pantalla completa (/admin/eventos/nuevo)"
-          >
-            Pantalla /nuevo
-          </VvButton>
-          <VvButton
-            size="md"
-            variant="gold"
-            onClick={handleOpenCreateEvent}
-          >
-            + Registrar Evento
-          </VvButton>
-        </div>
+        <VvButton
+          size="md"
+          variant="gold"
+          onClick={handleOpenCreateEvent}
+          className="hidden md:flex whitespace-nowrap"
+        >
+          + Registrar Evento
+        </VvButton>
       }
     >
+      {/* Floating Action Button (FAB) on mobile */}
+      {isMobileView && (
+        <button
+          type="button"
+          onClick={handleOpenCreateEvent}
+          className="fixed bottom-20 right-5 z-40 w-14 h-14 rounded-full vv-bg-gold-gradient vv-text-on-gold flex items-center justify-center text-3xl font-light shadow-[0_8px_25px_rgba(212,175,55,0.4)] border-2 border-[#fff3b0] active:scale-90 transition-transform"
+          aria-label="Registrar nuevo evento"
+        >
+          +
+        </button>
+      )}
+
       {bannerMessage && (
         <div className="p-3.5 rounded-xl vv-badge-success text-xs font-medium">
           {bannerMessage}
         </div>
       )}
 
-      {/* PESTAÑAS (TABS): Eventos Actuales (Activos) vs Eventos Realizados (Completados) */}
-      <div
-        className={`flex ${
-          isMobileView ? 'flex-col items-stretch' : 'flex-wrap items-center'
-        } gap-2.5 p-2.5 rounded-2xl vv-bg-surface border vv-border-gold`}
-      >
-        <VvButton
-          size="md"
-          variant={activeTab === 'activo' ? 'gold' : 'ghost'}
+      {/* PESTAÑAS (TABS): Control segmentado unido ("Junto") */}
+      <div className="flex p-1 rounded-xl vv-bg-surface border vv-border-gold max-w-md">
+        <button
+          type="button"
           onClick={() => setActiveTab('activo')}
-          className={isMobileView ? 'w-full' : 'flex-1 sm:flex-initial'}
+          className={`flex-1 py-2 px-3 text-xs font-semibold rounded-lg transition-all ${
+            activeTab === 'activo'
+              ? 'vv-bg-gold-gradient vv-text-on-gold shadow-sm'
+              : 'vv-text-muted hover:vv-text-secondary'
+          }`}
         >
-          Eventos Actuales (Activos) ({activeEvents.length})
-        </VvButton>
-        <VvButton
-          size="md"
-          variant={activeTab === 'completado' ? 'gold' : 'ghost'}
+          Eventos Activos ({activeEvents.length})
+        </button>
+        <button
+          type="button"
           onClick={() => setActiveTab('completado')}
-          className={isMobileView ? 'w-full' : 'flex-1 sm:flex-initial'}
+          className={`flex-1 py-2 px-3 text-xs font-semibold rounded-lg transition-all ${
+            activeTab === 'completado'
+              ? 'vv-bg-gold-gradient vv-text-on-gold shadow-sm'
+              : 'vv-text-muted hover:vv-text-secondary'
+          }`}
         >
-          Eventos Realizados (Completados) ({completedEvents.length})
-        </VvButton>
+          Eventos Realizados ({completedEvents.length})
+        </button>
       </div>
 
       {/* LISTA / GRILLA DE TARJETAS DE EVENTOS */}
@@ -226,51 +214,6 @@ export function AdminEventosPage() {
               </VvCard>
             )
           })}
-        </div>
-      )}
-
-      {/* MODAL DE REGISTRO / EDICIÓN DE EVENTO EN DESKTOP */}
-      {desktopModalOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Registrar o Editar Evento"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 vv-bg-glass overflow-y-auto"
-        >
-          <VvCard
-            variant="gold-highlight"
-            className="w-full max-w-2xl p-5 sm:p-6 space-y-5 my-auto vv-animate-modal"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <VvBadge variant="gold">Gestión de Eventos</VvBadge>
-                <VvHeading level={3} variant="serif" className="mt-1">
-                  {editingModalEvent
-                    ? 'Editar Datos del Evento'
-                    : 'Registrar Nuevo Evento'}
-                </VvHeading>
-              </div>
-              <VvButton
-                size="sm"
-                variant="ghost"
-                onClick={() => setDesktopModalOpen(false)}
-              >
-                ✕ Cerrar
-              </VvButton>
-            </div>
-
-            <EventFormContent
-              initialEvent={editingModalEvent}
-              onCancel={() => setDesktopModalOpen(false)}
-              onSuccess={(saved) => {
-                setDesktopModalOpen(false)
-                setBannerMessage(
-                  `Evento "${saved.name}" guardado correctamente.`
-                )
-                setTimeout(() => setBannerMessage(null), 3000)
-              }}
-            />
-          </VvCard>
         </div>
       )}
     </AdminLayout>

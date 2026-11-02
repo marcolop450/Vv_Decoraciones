@@ -10,8 +10,8 @@ import { useVvApp } from '../context/VvAppContext'
 
 export function LoginPage() {
   const { loginOwner } = useVvApp()
-  const [email, setEmail] = useState('veronica@gmail.com')
-  const [password, setPassword] = useState('20042008')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [errorAlert, setErrorAlert] = useState<string | null>(null)
 
@@ -68,7 +68,7 @@ export function LoginPage() {
               required
               value={email}
               onChange={setEmail}
-              placeholder="veronica@gmail.com"
+              placeholder="correo@ejemplo.com"
             />
             <VvTextInput
               label="Contraseña"

@@ -24,8 +24,8 @@ test.describe('Navegación Móvil y Responsividad Fluida', () => {
     await page.goto('/login')
 
     // Iniciar sesión legítimamente
-    await page.getByPlaceholder(/veronica@gmail.com/i).fill('veronica@gmail.com')
-    await page.getByPlaceholder(/••••••••/i).fill('20042008')
+    await page.getByLabel(/Usuario o Correo/i).fill('veronica@gmail.com')
+    await page.getByLabel(/Contraseña/i).fill('20042008')
     await page.getByRole('button', { name: /Iniciar Sesión/i }).click()
     await expect(page).toHaveURL(/.*\/admin\/inicio/)
 

@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test'
 
 async function loginAsAdmin(page: any) {
   await page.goto('/login')
-  await page.getByPlaceholder(/veronica@gmail.com/i).fill('veronica@gmail.com')
-  await page.getByPlaceholder(/••••••••/i).fill('20042008')
+  await page.getByLabel(/Usuario o Correo/i).fill('veronica@gmail.com')
+  await page.getByLabel(/Contraseña/i).fill('20042008')
   await page.getByRole('button', { name: /Iniciar Sesión/i }).click()
   await expect(page).toHaveURL(/.*\/admin\/inicio/)
 }
@@ -50,21 +50,21 @@ test.describe('Sistema 11 Pantallas Figma - Eventos Vero', () => {
     await expect(page.getByRole('heading', { name: /Panel de Administración V.v/i })).toBeVisible()
 
     // Probar intento fallido con credenciales inválidas
-    await page.getByPlaceholder(/veronica@gmail.com/i).fill('error@admin.com')
-    await page.getByPlaceholder(/••••••••/i).fill('claveerronea')
+    await page.getByLabel(/Usuario o Correo/i).fill('error@admin.com')
+    await page.getByLabel(/Contraseña/i).fill('claveerronea')
     await page.getByRole('button', { name: /Iniciar Sesión/i }).click()
 
     // Debe mostrarse alerta de error
     await expect(page.getByRole('alert')).toBeVisible()
 
     // Probar acceso con credenciales legítimas del dueño
-    await page.getByPlaceholder(/veronica@gmail.com/i).fill('veronica@gmail.com')
-    await page.getByPlaceholder(/••••••••/i).fill('20042008')
+    await page.getByLabel(/Usuario o Correo/i).fill('veronica@gmail.com')
+    await page.getByLabel(/Contraseña/i).fill('20042008')
     await page.getByRole('button', { name: /Iniciar Sesión/i }).click()
 
     // Debe redirigir a /admin/inicio
     await expect(page).toHaveURL(/.*\/admin\/inicio/)
-    await expect(page.getByRole('heading', { name: /Panel Principal del Dueño/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /Panel Principal/i })).toBeVisible()
   })
 
   test('4. Gestión de Categorías: Crear, Editar y Eliminar', async ({ page }) => {
@@ -97,16 +97,16 @@ test.describe('Sistema 11 Pantallas Figma - Eventos Vero', () => {
     await page.goto('/admin/eventos')
     await expect(page).toHaveTitle(/eventos/i)
 
-    // Tabs de Eventos Actuales vs Realizados
-    const tabActivos = page.getByRole('button', { name: /Eventos Actuales/i })
+    // Tabs de Eventos Activos vs Realizados
+    const tabActivos = page.getByRole('button', { name: /Eventos Activos/i })
     const tabCompletados = page.getByRole('button', { name: /Eventos Realizados/i })
     await expect(tabActivos).toBeVisible()
     await expect(tabCompletados).toBeVisible()
 
     // Navegar a /admin/eventos/nuevo
-    await page.getByRole('button', { name: /Pantalla \/nuevo/i }).click()
+    await page.getByRole('button', { name: /\+ Registrar Evento/i }).first().click()
     await expect(page).toHaveURL(/.*\/admin\/eventos\/nuevo/)
-    await expect(page.getByRole('heading', { name: /Registrar Nuevo Evento/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /Crear Evento/i })).toBeVisible()
 
     // Llenar campos del evento
     await page.getByLabel(/Nombre del Evento/i).fill('Gala de Aniversario E2E')

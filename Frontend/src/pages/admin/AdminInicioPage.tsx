@@ -102,8 +102,7 @@ export function AdminInicioPage() {
 
   return (
     <AdminLayout
-      title="Panel Principal del Dueño"
-      subtitle="Accesos directos rápidos optimizados para escritorio y móvil, junto con el estado de tus eventos activos de la semana."
+      title="Panel Principal"
       headerActions={
         <VvButton
           size="sm"
@@ -111,12 +110,24 @@ export function AdminInicioPage() {
           onClick={() =>
             navigate('/admin/eventos/nuevo', { editEventId: null })
           }
-          className="whitespace-nowrap shadow-sm hover:shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all"
+          className="hidden md:flex whitespace-nowrap shadow-sm hover:shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all"
         >
           + Registrar Evento
         </VvButton>
       }
     >
+      {/* Floating Action Button (FAB) on mobile */}
+      {isMobileView && (
+        <button
+          type="button"
+          onClick={() => navigate('/admin/eventos/nuevo', { editEventId: null })}
+          className="fixed bottom-20 right-5 z-40 w-14 h-14 rounded-full vv-bg-gold-gradient vv-text-on-gold flex items-center justify-center text-3xl font-light shadow-[0_8px_25px_rgba(212,175,55,0.4)] border-2 border-[#fff3b0] active:scale-90 transition-transform"
+          aria-label="Registrar nuevo evento"
+        >
+          +
+        </button>
+      )}
+
       {isMobileView ? (
         <div className="space-y-5">
           <div className="grid grid-cols-2 gap-3">
@@ -138,35 +149,23 @@ export function AdminInicioPage() {
             </VvCard>
           </div>
 
-          <div className="space-y-2.5">
+          <div className="space-y-2">
             <div className="text-xs font-semibold uppercase tracking-wider vv-text-muted">
               Accesos Rápidos
             </div>
-            <div className="grid grid-cols-1 gap-2.5">
+            <div className="flex flex-wrap gap-2">
               {shortcuts.map((item) => (
-                <VvCard
+                <button
                   key={item.route}
-                  variant="surface"
+                  type="button"
                   onClick={() => navigate(item.route)}
-                  className="p-3.5 flex items-center justify-between gap-3 border vv-border-gold hover:border-[#D4AF37] transition-all cursor-pointer"
+                  className="flex items-center gap-2 px-3.5 py-2 rounded-full vv-bg-surface border vv-border-gold hover:border-[#D4AF37] active:scale-95 transition-all text-xs font-medium vv-text-primary shadow-sm"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-lg vv-bg-elevated border vv-border-gold flex items-center justify-center shrink-0">
-                      {item.icon}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="font-semibold text-sm vv-text-primary truncate">
-                        {item.title}
-                      </div>
-                      <div className="text-xs vv-text-gold-light font-medium">
-                        {item.metric}
-                      </div>
-                    </div>
-                  </div>
-                  <span className="text-xs vv-text-muted shrink-0 font-medium">
-                    Abrir →
+                  <span className="w-4 h-4 flex items-center justify-center text-[#D4AF37]">
+                    {item.icon}
                   </span>
-                </VvCard>
+                  <span>{item.title}</span>
+                </button>
               ))}
             </div>
           </div>

@@ -108,14 +108,14 @@ export function EventFormContent({
           required
           value={name}
           onChange={setName}
-          placeholder="Ej. Boda Nupcial Gómez & Silva"
+          placeholder="Ej. Boda, XV Años, Graduación..."
         />
         <VvTextInput
           label="Nombre del Cliente"
           required
           value={clientName}
           onChange={setClientName}
-          placeholder="Ej. Marco Alejandro"
+          placeholder="Nombre completo del cliente"
         />
       </div>
 
@@ -130,15 +130,14 @@ export function EventFormContent({
           required
           value={phone}
           onChange={setPhone}
-          placeholder="70145892"
+          placeholder="70000000"
         />
         <VvTextInput
           label="Lugar / Ubicación (Salón, Casa o Colegio)"
           required
           value={venue}
           onChange={setVenue}
-          placeholder="Ej. Salón Las Palmeras, Domicilio particular, Colegio..."
-          helperText="Salón, casa, colegio o cualquier ubicación del evento"
+          placeholder="Salón, domicilio o local..."
         />
       </div>
 
@@ -154,7 +153,6 @@ export function EventFormContent({
           min={getLocalIsoDate(0)}
           value={date}
           onChange={setDate}
-          helperText="Fechas anteriores a hoy no están permitidas para nuevos eventos"
         />
         <div className="space-y-1.5">
           <label className="block text-xs font-semibold uppercase tracking-wider vv-text-secondary">
@@ -180,7 +178,7 @@ export function EventFormContent({
           required
           value={totalPriceStr}
           onChange={handleTotalPriceChange}
-          placeholder="12000"
+          placeholder="0"
         />
         <VvTextInput
           label="Adelanto / Seña Recibida (Bs.)"
@@ -188,8 +186,7 @@ export function EventFormContent({
           required
           value={advancePriceStr}
           onChange={setAdvancePriceStr}
-          placeholder="6000"
-          helperText="Sugerido habitual: 50% (la mitad), ajustable libremente"
+          placeholder="0"
         />
       </div>
 
