@@ -188,7 +188,7 @@ test.describe('Sistema 11 Pantallas Figma - Eventos Vero', () => {
 
     const modal = page.getByRole('dialog', { name: /Cotizar Decoración por WhatsApp/i })
     await expect(modal).toBeVisible()
-    await expect(modal.getByRole('button', { name: /Consultar sin fecha/i })).toBeVisible()
+    await expect(modal.getByRole('button', { name: /^Enviar$/i })).toBeVisible()
 
     await modal.getByRole('button', { name: /✕/i }).click()
     await expect(modal).toBeHidden()
