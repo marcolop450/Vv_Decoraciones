@@ -146,17 +146,10 @@ export const AiAssistantService = {
     const cleanPrompt = guardrail.sanitizedInput
     const geminiKey = import.meta.env.VITE_GEMINI_API_KEY
     const groqKey = import.meta.env.VITE_GROQ_API_KEY
-
-    // Paso 2: Intentar API de Google Gemini Flash (Capa Gratuita) si está configurada
-    if (geminiKey) {
-      try {
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 4500)
-
-        const metrics = GuardrailsService.getVerifiedMetrics(state)
-        const systemInstruction = `Eres el Asistente de ${
-          role === 'finanzas' ? 'Finanzas y Cobranzas' : role === 'agenda' ? 'Agenda y Montajes' : 'Ventas'
-        } de "V.v Decoración de Eventos y Cotillón".
+    const metrics = GuardrailsService.getVerifiedMetrics(state)
+    const systemInstruction = `Eres el Asistente de ${
+      role === 'finanzas' ? 'Finanzas y Cobranzas' : role === 'agenda' ? 'Agenda y Montajes' : 'Ventas'
+    } de "V.v Decoración de Eventos y Cotillón".
 Responde con tono profesional, sobrio y elegante. Todas las cifras son en Bolivianos (Bs.).
 Datos actuales auditados:
 - Eventos activos: ${metrics.activeCount}
@@ -164,8 +157,14 @@ Datos actuales auditados:
 - Total contratado: Bs. ${metrics.totalContractedBs.toLocaleString()}
 No inventes datos que no estén aquí.`
 
+    // Paso 2A: Intentar API de Google Gemini (gemini-3.5-flash)
+    if (geminiKey) {
+      try {
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 4000)
+
         const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${geminiKey}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -200,7 +199,52 @@ No inventes datos que no estén aquí.`
           }
         }
       } catch {
-        // Fallback silencioso sin interrumpir la experiencia
+        // Fallback a Groq o semántico
+      }
+    }
+
+    // Paso 2B: Fallback a Groq (qwen/qwen3.8-27b)
+    if (groqKey) {
+      try {
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 3500)
+
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${groqKey}`,
+          },
+          body: JSON.stringify({
+            model: 'qwen/qwen3.8-27b',
+            messages: [
+              { role: 'system', content: systemInstruction },
+              { role: 'user', content: cleanPrompt },
+            ],
+            temperature: 0.3,
+            max_tokens: 350,
+          }),
+          signal: controller.signal,
+        })
+
+        clearTimeout(timeoutId)
+
+        if (response.ok) {
+          const data = await response.json()
+          const rawText = data?.choices?.[0]?.message?.content
+          if (rawText) {
+            const verifiedText = GuardrailsService.enforceGrounding(rawText.trim(), state)
+            const localSemantic = this.processLocalSemanticQuery(cleanPrompt, role, state)
+            return {
+              text: verifiedText,
+              agentRole: role,
+              attachedEvents: localSemantic.attachedEvents,
+              attachedPhotos: localSemantic.attachedPhotos,
+            }
+          }
+        }
+      } catch {
+        // Fallback a motor semántico local
       }
     }
 

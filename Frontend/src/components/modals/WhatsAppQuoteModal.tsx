@@ -10,6 +10,33 @@ import {
   VvHeading,
 } from '../ui/VvPrimitives'
 
+async function getImageFile(imageUrl: string, name: string): Promise<File | null> {
+  try {
+    let blob: Blob
+    if (imageUrl.startsWith('data:')) {
+      const parts = imageUrl.split(',')
+      const mime = parts[0].match(/:(.*?);/)?.[1] || 'image/jpeg'
+      const bstr = atob(parts[1])
+      let n = bstr.length
+      const u8arr = new Uint8Array(n)
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n)
+      }
+      blob = new Blob([u8arr], { type: mime })
+    } else {
+      const res = await fetch(imageUrl, { mode: 'cors' })
+      blob = await res.blob()
+    }
+
+    const mimeType = blob.type || 'image/jpeg'
+    const ext = mimeType.includes('png') ? 'png' : 'jpg'
+    const safeName = name.toLowerCase().replace(/[^a-z0-9]/g, '_')
+    return new File([blob], `decoracion_${safeName}.${ext}`, { type: mimeType })
+  } catch {
+    return null
+  }
+}
+
 export function WhatsAppQuoteModal() {
   const { quotePhoto, closeWhatsAppQuote, getCategoryName, state } = useVvApp()
   const todayIso = useMemo(() => getLocalIsoDate(0), [])
@@ -24,58 +51,52 @@ export function WhatsAppQuoteModal() {
     quotePhoto.imageUrl &&
     (quotePhoto.imageUrl.startsWith('http://') || quotePhoto.imageUrl.startsWith('https://'))
   )
-  const photoUrlInfo = isRealHttpUrl
-    ? `\n\nFoto de referencia:\n${quotePhoto.imageUrl}`
-    : ''
 
   const hasValidDate = Boolean(selectedDate && selectedDate >= todayIso)
   const readableDate = hasValidDate ? formatReadableDate(selectedDate) : ''
-  const whatsappMessage = hasValidDate
-    ? `Hola, quiero cotizar la decoración ${quotePhoto.name} para la fecha ${readableDate} (${selectedDate}).${photoUrlInfo}`
-    : `Hola, quiero consultar por la decoración ${quotePhoto.name}.${photoUrlInfo}`
+  
+  // Descripción unificada que acompaña a la foto como leyenda / pie de foto
+  const captionDescription = hasValidDate
+    ? `Hola V.v Decoración, quiero cotizar la decoración "${quotePhoto.name}" para la fecha ${readableDate} (${selectedDate}).`
+    : `Hola V.v Decoración, quiero consultar por la decoración "${quotePhoto.name}".`
 
   const handleSendWhatsApp = async () => {
-    // 1. Si el navegador soporta compartir archivos nativamente (móviles y tablets), adjunta la foto directo a WhatsApp
+    // 1. Enviar [Foto + Descripción] juntos como un solo mensaje en móviles y tablets (Web Share API)
     if (typeof navigator !== 'undefined' && quotePhoto.imageUrl) {
       try {
-        const response = await fetch(quotePhoto.imageUrl)
-        const blob = await response.blob()
-        const mimeType = blob.type || 'image/jpeg'
-        const ext = mimeType.includes('png') ? 'png' : 'jpg'
-        const file = new File(
-          [blob],
-          `decoracion_${quotePhoto.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}.${ext}`,
-          { type: mimeType }
-        )
-
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        const file = await getImageFile(quotePhoto.imageUrl, quotePhoto.name)
+        if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+          // Al omitir 'title', WhatsApp coloca 'text' directamente como la leyenda (caption) de la foto en un solo mensaje
           await navigator.share({
             files: [file],
-            title: `Cotización: ${quotePhoto.name}`,
-            text: whatsappMessage,
+            text: captionDescription,
           })
           handleClose()
           return
         }
       } catch {
-        // Si el usuario cancela o no hay soporte de archivos, continúa al enlace directo
+        // Fallback silencioso a enlace directo si el usuario cancela
       }
     }
 
-    // 2. Enlace universal directo wa.me
-    const encoded = encodeURIComponent(whatsappMessage)
-    const url = `https://wa.me/${targetPhone}?text=${encoded}`
-    window.open(url, '_blank', 'noopener,noreferrer')
+    // 2. En escritorio / WhatsApp Web: abrir chat con tarjeta o imagen en portapapeles
+    if (isRealHttpUrl) {
+      const fullText = `${captionDescription}\n\n${quotePhoto.imageUrl}`
+      const encoded = encodeURIComponent(fullText)
+      window.open(`https://wa.me/${targetPhone}?text=${encoded}`, '_blank', 'noopener,noreferrer')
+    } else {
+      await handleCopyImage()
+      const encoded = encodeURIComponent(captionDescription)
+      window.open(`https://wa.me/${targetPhone}?text=${encoded}`, '_blank', 'noopener,noreferrer')
+    }
     handleClose()
   }
 
   const handleCopyImage = async () => {
     if (!quotePhoto.imageUrl) return
     try {
-      const response = await fetch(quotePhoto.imageUrl)
-      const blob = await response.blob()
-      if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
-        // En navegadores modernos solo se soporta image/png en portapapeles directo
+      const file = await getImageFile(quotePhoto.imageUrl, quotePhoto.name)
+      if (file && typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
         const img = new Image()
         img.crossOrigin = 'anonymous'
         img.src = quotePhoto.imageUrl
@@ -98,7 +119,7 @@ export function WhatsAppQuoteModal() {
         }, 'image/png')
       }
     } catch {
-      // Ignora si no hay permisos de portapapeles
+      // Ignora permisos bloqueados
     }
   }
 
@@ -151,9 +172,9 @@ export function WhatsAppQuoteModal() {
             <button
               type="button"
               onClick={handleCopyImage}
-              className="text-[11px] vv-text-gold hover:underline font-medium inline-flex items-center gap-1"
+              className="text-[11px] vv-text-gold hover:underline font-medium inline-flex items-center gap-1 cursor-pointer"
             >
-              <span>{copiedImageAlert ? '✓ Imagen copiada para pegar en WhatsApp' : 'Copiar imagen al portapapeles'}</span>
+              <span>{copiedImageAlert ? '✓ Foto copiada para pegar en WhatsApp' : 'Copiar foto al portapapeles'}</span>
             </button>
           </div>
         </div>
@@ -192,13 +213,18 @@ export function WhatsAppQuoteModal() {
           </div>
         </div>
 
-        {/* Vista previa limpia del mensaje */}
+        {/* Vista previa limpia del mensaje [Foto + Descripción] */}
         <div className="p-3.5 rounded-xl border vv-border-gold space-y-2" style={{ backgroundColor: 'var(--vv-bg-subtle)' }}>
-          <span className="text-xs font-semibold uppercase tracking-wider vv-text-secondary">
-            Mensaje que se enviará al WhatsApp:
-          </span>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider vv-text-secondary">
+              Mensaje [Foto + Descripción]:
+            </span>
+            <span className="text-[10px] vv-text-gold font-medium">
+              Pie de foto unificado
+            </span>
+          </div>
           <div className="p-2.5 rounded-lg vv-bg-surface text-xs vv-font-mono vv-text-gold-light border vv-border-gold break-words">
-            &ldquo;{whatsappMessage}&rdquo;
+            &ldquo;{captionDescription}&rdquo;
           </div>
         </div>
 
@@ -211,7 +237,7 @@ export function WhatsAppQuoteModal() {
             variant={hasValidDate ? 'gold' : 'outline'}
             onClick={handleSendWhatsApp}
           >
-            {hasValidDate ? 'Enviar a WhatsApp' : 'Consultar sin fecha'}
+            {hasValidDate ? 'Enviar [Foto + Fecha]' : 'Consultar sin fecha'}
           </VvButton>
         </div>
       </VvCard>
