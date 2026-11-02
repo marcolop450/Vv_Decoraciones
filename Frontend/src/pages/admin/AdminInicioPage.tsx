@@ -116,6 +116,27 @@ export function AdminInicioPage() {
         </VvButton>
       }
     >
+      {/* Burbuja mejorada para registrar eventos en móvil */}
+      {isMobileView && (
+        <button
+          type="button"
+          onClick={() => navigate('/admin/eventos/nuevo', { editEventId: null })}
+          className="fixed bottom-20 right-4 z-40 h-12 px-4 rounded-full vv-bg-gold-gradient vv-text-on-gold flex items-center gap-2 shadow-[0_8px_25px_rgba(212,175,55,0.45)] border border-[#fff3b0] hover:scale-105 active:scale-95 transition-all text-xs font-bold tracking-wide cursor-pointer"
+          aria-label="Registrar Evento"
+        >
+          <svg
+            className="w-4 h-4 stroke-[2.5]"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+          >
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          <span>+ Crear Evento</span>
+        </button>
+      )}
+
       {isMobileView ? (
         <div className="space-y-5">
           <div className="grid grid-cols-2 gap-3">
@@ -137,22 +158,25 @@ export function AdminInicioPage() {
             </VvCard>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             <div className="text-xs font-semibold uppercase tracking-wider vv-text-muted">
               Accesos Rápidos
             </div>
-            <div className="flex flex-wrap gap-2">
+            {/* Cuadrados simples en móvil (2 columnas simétricas) */}
+            <div className="grid grid-cols-2 gap-3">
               {shortcuts.map((item) => (
                 <button
                   key={item.route}
                   type="button"
                   onClick={() => navigate(item.route)}
-                  className="flex items-center gap-2 px-3.5 py-2 rounded-full vv-bg-surface border vv-border-gold hover:border-[#D4AF37] active:scale-95 transition-all text-xs font-medium vv-text-primary shadow-sm"
+                  className="aspect-square p-4 rounded-2xl vv-bg-surface border vv-border-gold hover:border-[#D4AF37] active:scale-95 transition-all flex flex-col items-center justify-center text-center gap-2.5 group shadow-sm cursor-pointer"
                 >
-                  <span className="w-4 h-4 flex items-center justify-center text-[#D4AF37]">
+                  <div className="w-11 h-11 rounded-xl vv-bg-elevated border vv-border-gold flex items-center justify-center text-[#D4AF37] group-hover:scale-110 transition-transform shadow-inner">
                     {item.icon}
-                  </span>
-                  <span>{item.title}</span>
+                  </div>
+                  <div className="font-semibold text-xs vv-text-primary leading-tight">
+                    {item.title}
+                  </div>
                 </button>
               ))}
             </div>

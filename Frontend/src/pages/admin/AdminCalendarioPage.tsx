@@ -142,19 +142,15 @@ export function AdminCalendarioPage() {
             </VvButton>
           </div>
 
-          {/* Leyenda de Indicadores */}
+          {/* Leyenda resumida de colores */}
           <div className="flex flex-wrap items-center gap-4 text-xs vv-text-secondary pb-2 border-b vv-border-gold">
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded border-2 vv-border-gold-strong inline-block" />
-              <span>Día Actual (Hoy)</span>
-            </div>
-            <div className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block" />
-              <span>Día con Evento(s)</span>
+              <span>Día con Evento</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded vv-bg-gold-gradient inline-block" />
-              <span>Fecha Seleccionada</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-[#D4AF37] inline-block" />
+              <span>Día Actual / Seleccionado</span>
             </div>
           </div>
 
@@ -167,11 +163,11 @@ export function AdminCalendarioPage() {
             ))}
           </div>
 
-          {/* Celdas del Mes */}
-          <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
+          {/* Celdas del Mes - Sin desbordes de texto */}
+          <div className="grid grid-cols-7 gap-1 sm:gap-2">
             {Array.from({ length: calendarGrid.firstDayWeekIndex }).map(
               (_, idx) => (
-                <div key={`empty-${idx}`} className="h-14 sm:h-16" />
+                <div key={`empty-${idx}`} className="h-12 sm:h-16" />
               )
             )}
 
@@ -189,46 +185,44 @@ export function AdminCalendarioPage() {
                       setSelectedDateIso(day.iso)
                     }
                   }}
-                  className={`h-14 sm:h-16 rounded-xl p-1.5 flex flex-col items-center justify-between transition-all cursor-pointer select-none ${
+                  className={`h-12 sm:h-16 rounded-xl p-1 sm:p-1.5 flex flex-col items-center justify-between transition-all cursor-pointer select-none relative overflow-hidden ${
                     isSelected
                       ? 'vv-bg-gold-gradient vv-text-on-gold font-bold vv-shadow-glow'
                       : day.isToday
-                        ? 'vv-bg-elevated border-2 vv-border-gold-strong vv-text-gold-light font-bold'
+                        ? 'vv-bg-elevated border-2 border-[#D4AF37] vv-text-gold-light font-bold'
                         : day.eventsCount > 0
                           ? 'vv-bg-elevated border vv-border-gold-strong vv-text-primary font-semibold'
                           : 'vv-bg-elevated border vv-border-gold vv-text-secondary hover:vv-text-primary'
                   }`}
                 >
-                  <div className="flex items-center justify-between w-full px-0.5">
-                    <span className="text-xs sm:text-sm">{day.dayNum}</span>
+                  <div className="flex flex-col items-center">
+                    <span className="text-xs sm:text-sm leading-tight">
+                      {day.dayNum}
+                    </span>
                     {day.isToday && (
                       <span
-                        className={`text-xs uppercase px-1 rounded ${
-                          isSelected
-                            ? 'vv-bg-base vv-text-gold-light'
-                            : 'vv-badge-gold'
+                        className={`w-1 h-1 rounded-full mt-0.5 ${
+                          isSelected ? 'bg-[#0B0B0E]' : 'bg-[#D4AF37]'
                         }`}
-                      >
-                        Hoy
-                      </span>
+                      />
                     )}
                   </div>
 
-                  {/* Indicadores de Eventos en el Día */}
-                  <div className="flex items-center gap-1">
-                    {day.eventsCount > 0 && (
-                      <>
-                        <span
-                          className={`w-2 h-2 rounded-full ${
-                            isSelected ? 'vv-bg-base' : 'bg-amber-400'
-                          }`}
-                        />
-                        <span className="text-xs font-mono">
-                          {day.eventsCount} ev.
+                  {/* Indicador de Eventos compacto que nunca desborda */}
+                  {day.eventsCount > 0 && (
+                    <div className="flex items-center gap-0.5 mt-auto">
+                      <span
+                        className={`w-2 h-2 rounded-full ${
+                          isSelected ? 'bg-[#0B0B0E]' : 'bg-amber-400'
+                        }`}
+                      />
+                      {day.eventsCount > 1 && (
+                        <span className="text-[10px] font-mono leading-none">
+                          {day.eventsCount}
                         </span>
-                      </>
-                    )}
-                  </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )
             })}
@@ -242,18 +236,11 @@ export function AdminCalendarioPage() {
             isMobileView ? '' : 'lg:col-span-5'
           } p-5 sm:p-6 space-y-4`}
         >
-          <div className="flex items-center justify-between gap-2">
-            <div>
-              <VvBadge variant="gold">
-                {selectedDateIso === todayIso
-                  ? 'Día Actual (Hoy)'
-                  : 'Fecha Seleccionada'}
-              </VvBadge>
-              <VvHeading level={3} variant="serif" className="mt-1">
-                {formatReadableDate(selectedDateIso)}
-              </VvHeading>
-            </div>
-            <span className="vv-font-mono text-xs vv-text-muted">
+          <div className="flex items-center justify-between gap-2 pb-2 border-b vv-border-gold">
+            <VvHeading level={3} variant="serif" className="text-lg sm:text-xl">
+              {formatReadableDate(selectedDateIso)}
+            </VvHeading>
+            <span className="vv-font-mono text-xs vv-text-gold-light font-semibold">
               {selectedDayEvents.length} evento(s)
             </span>
           </div>

@@ -7,6 +7,7 @@ import {
   VvHeading,
 } from '../components/ui/VvPrimitives'
 import { useVvApp } from '../context/VvAppContext'
+import type { CatalogPhoto } from '../types/vv-app'
 
 export function LandingPage() {
   const {
@@ -17,6 +18,7 @@ export function LandingPage() {
     isMobileView,
   } = useVvApp()
   const [shuffleSeed, setShuffleSeed] = useState(0)
+  const [detailPhoto, setDetailPhoto] = useState<CatalogPhoto | null>(null)
 
   // Selecciona de forma aleatoria hasta 3 fotos registradas en el sistema
   const randomThreePhotos = useMemo(() => {
@@ -48,8 +50,63 @@ export function LandingPage() {
 
   return (
     <PublicLayout>
-      {/* HERO SECTION PRINCIPAL - GALA NOCTURNA LIMPIA Y CENTRADA */}
-      <section className="relative overflow-hidden border-b vv-border-gold py-14 sm:py-20 md:py-28">
+      {detailPhoto ? (
+        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
+          <div className="flex items-center justify-between pb-3 border-b vv-border-gold">
+            <VvButton
+              size="sm"
+              variant="outline"
+              onClick={() => setDetailPhoto(null)}
+            >
+              ← Volver al Inicio
+            </VvButton>
+            <VvBadge variant="gold">
+              {getCategoryName(detailPhoto.categoryId)}
+            </VvBadge>
+          </div>
+
+          <VvCard variant="gold-highlight" className="p-5 sm:p-8 space-y-6">
+            <div className="w-full h-80 sm:h-[450px] rounded-2xl overflow-hidden border vv-border-gold relative">
+              <img
+                src={detailPhoto.imageUrl}
+                alt={detailPhoto.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="space-y-4">
+              <VvHeading level={1} variant="serif" metallic className="text-2xl sm:text-4xl font-bold">
+                {detailPhoto.name}
+              </VvHeading>
+              <p className="text-sm sm:text-base vv-text-secondary leading-relaxed whitespace-pre-line">
+                {detailPhoto.description}
+              </p>
+
+              <div className="pt-4 border-t vv-border-gold flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <VvButton
+                  size="lg"
+                  variant="gold"
+                  onClick={() => openWhatsAppQuote(detailPhoto)}
+                  className="w-full sm:w-auto shadow-lg hover:shadow-[0_0_24px_rgba(212,175,55,0.4)] transition-all font-semibold"
+                >
+                  Cotizar esta Decoración por WhatsApp
+                </VvButton>
+                <VvButton
+                  size="lg"
+                  variant="ghost"
+                  onClick={() => setDetailPhoto(null)}
+                  className="w-full sm:w-auto"
+                >
+                  Volver a la Muestra
+                </VvButton>
+              </div>
+            </div>
+          </VvCard>
+        </section>
+      ) : (
+        <>
+          {/* HERO SECTION PRINCIPAL - GALA NOCTURNA LIMPIA Y CENTRADA */}
+          <section className="relative overflow-hidden border-b vv-border-gold py-14 sm:py-20 md:py-28">
         {/* Resplandor ambiental dorado suave de fondo */}
         <div
           aria-hidden="true"
@@ -160,14 +217,14 @@ export function LandingPage() {
               <VvCard
                 key={photo.id}
                 variant="surface"
-                className="overflow-hidden flex flex-col justify-between hover:border-[#d4af37]/70 transition-all duration-300 hover:-translate-y-1"
+                className="overflow-hidden flex flex-col justify-between hover:border-[#d4af37]/70 transition-all duration-300 hover:-translate-y-1 cursor-pointer group"
               >
-                <div>
+                <div onClick={() => setDetailPhoto(photo)}>
                   <div className="relative h-56 overflow-hidden">
                     <img
                       src={photo.imageUrl}
                       alt={photo.name}
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                     <div className="absolute top-3 left-3">
@@ -181,9 +238,12 @@ export function LandingPage() {
                     <VvHeading level={3} variant="serif">
                       {photo.name}
                     </VvHeading>
-                    <p className="text-xs sm:text-sm vv-text-secondary leading-relaxed">
+                    <p className="text-xs sm:text-sm vv-text-secondary leading-relaxed line-clamp-2">
                       {photo.description}
                     </p>
+                    <span className="text-xs text-[#D4AF37] underline inline-block">
+                      Ver Detalle y Fotos →
+                    </span>
                   </div>
                 </div>
 
@@ -215,6 +275,8 @@ export function LandingPage() {
           </div>
         )}
       </section>
+        </>
+      )}
     </PublicLayout>
   )
 }
