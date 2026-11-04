@@ -91,12 +91,17 @@ export function AdminLayout({
   subtitle,
   headerActions,
   hideBottomNav = false,
+  floatingAction,
   children,
 }: {
   title: string
   subtitle?: string
   headerActions?: React.ReactNode
   hideBottomNav?: boolean
+  floatingAction?: {
+    onClick: () => void
+    label: string
+  } | boolean
   children: React.ReactNode
 }) {
   const { currentRoute, navigate, logoutOwner } = useVvApp()
@@ -389,6 +394,37 @@ export function AdminLayout({
           {children}
         </main>
       </div>
+
+      {/* Botón flotante (+) anclado de forma fija e inamovible al viewport (fuera de contenedores con transform) */}
+      {floatingAction && (
+        <button
+          type="button"
+          onClick={
+            typeof floatingAction === 'object' && 'onClick' in floatingAction
+              ? floatingAction.onClick
+              : () => navigate('/admin/eventos/nuevo', { editEventId: null })
+          }
+          aria-label={
+            typeof floatingAction === 'object' && 'label' in floatingAction
+              ? floatingAction.label
+              : 'Registrar Evento'
+          }
+          className="md:hidden fixed bottom-[76px] right-4 z-40 w-14 h-14 rounded-full vv-bg-gold-gradient text-[#0B0B0E] flex items-center justify-center shadow-[0_6px_25px_rgba(212,175,55,0.5)] border-2 border-[#fff3b0] hover:scale-105 active:scale-90 transition-transform cursor-pointer"
+        >
+          <svg
+            className="w-7 h-7"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        </button>
+      )}
 
       {/* Barra inferior de navegación nativa para Móviles (<= 768px) */}
       {!hideBottomNav && (

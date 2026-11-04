@@ -103,6 +103,10 @@ export function AdminInicioPage() {
   return (
     <AdminLayout
       title="Panel Principal"
+      floatingAction={{
+        onClick: () => navigate('/admin/eventos/nuevo', { editEventId: null }),
+        label: 'Registrar Evento',
+      }}
       headerActions={
         <VvButton
           size="sm"
@@ -116,28 +120,6 @@ export function AdminInicioPage() {
         </VvButton>
       }
     >
-      {/* Botón flotante (+) anclado persistentemente a la pantalla */}
-      {isMobileView && (
-        <button
-          type="button"
-          onClick={() => navigate('/admin/eventos/nuevo', { editEventId: null })}
-          className="fixed bottom-22 right-5 z-40 w-14 h-14 rounded-full vv-bg-gold-gradient text-[#0B0B0E] flex items-center justify-center shadow-[0_6px_25px_rgba(212,175,55,0.5)] border-2 border-[#fff3b0] hover:scale-105 active:scale-90 transition-transform cursor-pointer"
-          aria-label="Registrar Evento"
-        >
-          <svg
-            className="w-7 h-7"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-        </button>
-      )}
 
       {isMobileView ? (
         <div className="space-y-5">
