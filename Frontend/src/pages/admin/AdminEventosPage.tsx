@@ -9,6 +9,9 @@ import {
 import { useVvApp } from '../../context/VvAppContext'
 import { formatReadableDate } from '../../data/vvInitialAppData'
 import type { EventLifecycleStatus, EventRecord } from '../../types/vv-app'
+import { VvPagination } from '../../components/ui/VvPagination'
+
+const PAGE_SIZE = 6
 
 export function AdminEventosPage() {
   const {
@@ -21,11 +24,24 @@ export function AdminEventosPage() {
 
   const [activeTab, setActiveTab] = useState<EventLifecycleStatus>('activo')
   const [bannerMessage, setBannerMessage] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
 
   const activeEvents = state.events.filter((e) => e.status === 'activo')
   const completedEvents = state.events.filter((e) => e.status === 'completado')
   const displayedEvents =
     activeTab === 'activo' ? activeEvents : completedEvents
+
+  const totalPages = Math.ceil(displayedEvents.length / PAGE_SIZE) || 1
+  const validPage = Math.min(currentPage, totalPages)
+  const paginatedEvents = displayedEvents.slice(
+    (validPage - 1) * PAGE_SIZE,
+    validPage * PAGE_SIZE
+  )
+
+  const handleTabChange = (tab: EventLifecycleStatus) => {
+    setActiveTab(tab)
+    setCurrentPage(1)
+  }
 
   const handleOpenCreateEvent = () => {
     navigate('/admin/eventos/nuevo', { editEventId: null })
@@ -55,12 +71,12 @@ export function AdminEventosPage() {
         </VvButton>
       }
     >
-      {/* Burbuja mejorada circular con '+' centrado en móvil */}
+      {/* Botón flotante (+) anclado persistentemente a la pantalla */}
       {isMobileView && (
         <button
           type="button"
           onClick={handleOpenCreateEvent}
-          className="fixed bottom-20 right-4 z-40 w-13 h-13 sm:w-14 sm:h-14 rounded-full vv-bg-gold-gradient text-[#0B0B0E] flex items-center justify-center shadow-[0_6px_25px_rgba(212,175,55,0.5)] border-2 border-[#fff3b0] hover:scale-105 active:scale-90 transition-transform cursor-pointer"
+          className="fixed bottom-22 right-5 z-40 w-14 h-14 rounded-full vv-bg-gold-gradient text-[#0B0B0E] flex items-center justify-center shadow-[0_6px_25px_rgba(212,175,55,0.5)] border-2 border-[#fff3b0] hover:scale-105 active:scale-90 transition-transform cursor-pointer"
           aria-label="Registrar Evento"
         >
           <svg
@@ -84,14 +100,14 @@ export function AdminEventosPage() {
         </div>
       )}
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {/* Barra de control: Tabs de Eventos + Botón Registrar en móvil y escritorio */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
           <div className="flex p-1 rounded-xl vv-bg-surface border vv-border-gold flex-1 sm:max-w-md">
             <button
               type="button"
-              onClick={() => setActiveTab('activo')}
-              className={`flex-1 py-2 px-3 text-xs font-semibold rounded-lg transition-all ${
+              onClick={() => handleTabChange('activo')}
+              className={`flex-1 py-2 px-3 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
                 activeTab === 'activo'
                   ? 'vv-bg-gold-gradient vv-text-on-gold shadow-sm'
                   : 'vv-text-muted hover:vv-text-secondary'
@@ -101,8 +117,8 @@ export function AdminEventosPage() {
             </button>
             <button
               type="button"
-              onClick={() => setActiveTab('completado')}
-              className={`flex-1 py-2 px-3 text-xs font-semibold rounded-lg transition-all ${
+              onClick={() => handleTabChange('completado')}
+              className={`flex-1 py-2 px-3 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
                 activeTab === 'completado'
                   ? 'vv-bg-gold-gradient vv-text-on-gold shadow-sm'
                   : 'vv-text-muted hover:vv-text-secondary'
@@ -143,7 +159,7 @@ export function AdminEventosPage() {
               isMobileView ? 'gap-4' : 'lg:grid-cols-2 gap-5'
             }`}
           >
-          {displayedEvents.map((ev) => {
+          {paginatedEvents.map((ev) => {
             const pendingBs = Math.max(0, ev.totalPriceBs - ev.advancePriceBs)
             return (
               <VvCard
@@ -238,6 +254,16 @@ export function AdminEventosPage() {
             )
           })}
         </div>
+      )}
+
+      {displayedEvents.length > 0 && (
+        <VvPagination
+          currentPage={validPage}
+          totalPages={totalPages}
+          totalItems={displayedEvents.length}
+          pageSize={PAGE_SIZE}
+          onPageChange={setCurrentPage}
+        />
       )}
       </div>
     </AdminLayout>

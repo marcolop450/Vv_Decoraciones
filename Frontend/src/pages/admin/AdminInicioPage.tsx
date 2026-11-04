@@ -116,12 +116,12 @@ export function AdminInicioPage() {
         </VvButton>
       }
     >
-      {/* Burbuja mejorada circular con '+' centrado en móvil */}
+      {/* Botón flotante (+) anclado persistentemente a la pantalla */}
       {isMobileView && (
         <button
           type="button"
           onClick={() => navigate('/admin/eventos/nuevo', { editEventId: null })}
-          className="fixed bottom-20 right-4 z-40 w-13 h-13 sm:w-14 sm:h-14 rounded-full vv-bg-gold-gradient text-[#0B0B0E] flex items-center justify-center shadow-[0_6px_25px_rgba(212,175,55,0.5)] border-2 border-[#fff3b0] hover:scale-105 active:scale-90 transition-transform cursor-pointer"
+          className="fixed bottom-22 right-5 z-40 w-14 h-14 rounded-full vv-bg-gold-gradient text-[#0B0B0E] flex items-center justify-center shadow-[0_6px_25px_rgba(212,175,55,0.5)] border-2 border-[#fff3b0] hover:scale-105 active:scale-90 transition-transform cursor-pointer"
           aria-label="Registrar Evento"
         >
           <svg

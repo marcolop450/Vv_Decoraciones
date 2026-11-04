@@ -10,6 +10,9 @@ import {
 } from '../components/ui/VvPrimitives'
 import { useVvApp } from '../context/VvAppContext'
 import type { CatalogPhoto } from '../types/vv-app'
+import { VvPagination } from '../components/ui/VvPagination'
+
+const PAGE_SIZE = 8
 
 export function CatalogoPage() {
   const {
@@ -20,6 +23,7 @@ export function CatalogoPage() {
   } = useVvApp()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [currentPage, setCurrentPage] = useState(1)
   const [detailPhoto, setDetailPhoto] = useState<CatalogPhoto | null>(null)
 
   const targetWhatsAppPhone = (state.config?.whatsappPhone || '59177885220').replace(/[^0-9]/g, '')
@@ -48,6 +52,23 @@ export function CatalogoPage() {
       return matchesCategory && matchesSearch
     })
   }, [state.photos, selectedCategory, searchQuery, getCategoryName])
+
+  const totalPages = Math.ceil(filteredPhotos.length / PAGE_SIZE) || 1
+  const validPage = Math.min(currentPage, totalPages)
+  const paginatedPhotos = filteredPhotos.slice(
+    (validPage - 1) * PAGE_SIZE,
+    validPage * PAGE_SIZE
+  )
+
+  const handleCategorySelect = (catId: string) => {
+    setSelectedCategory(catId)
+    setCurrentPage(1)
+  }
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query)
+    setCurrentPage(1)
+  }
 
   return (
     <PublicLayout>
@@ -130,7 +151,7 @@ export function CatalogoPage() {
                 <div className="relative flex-1">
                   <VvInlineInput
                     value={searchQuery}
-                    onChange={setSearchQuery}
+                    onChange={handleSearchChange}
                     placeholder="Buscar decoración por nombre, estilo o detalle (ej. altar, XV años, velas, cotillón)..."
                     className="w-full text-sm"
                   />
@@ -139,7 +160,7 @@ export function CatalogoPage() {
                   <VvButton
                     size="sm"
                     variant="ghost"
-                    onClick={() => setSearchQuery('')}
+                    onClick={() => handleSearchChange('')}
                   >
                     Limpiar búsqueda
                   </VvButton>
@@ -151,7 +172,7 @@ export function CatalogoPage() {
                 <VvButton
                   size="sm"
                   variant={selectedCategory === 'all' ? 'gold' : 'subtle'}
-                  onClick={() => setSelectedCategory('all')}
+                  onClick={() => handleCategorySelect('all')}
                 >
                   Todos ({state.photos.length})
                 </VvButton>
@@ -164,7 +185,7 @@ export function CatalogoPage() {
                       key={cat.id}
                       size="sm"
                       variant={selectedCategory === cat.id ? 'gold' : 'subtle'}
-                      onClick={() => setSelectedCategory(cat.id)}
+                      onClick={() => handleCategorySelect(cat.id)}
                     >
                       {cat.name} ({count})
                     </VvButton>
@@ -226,58 +247,68 @@ export function CatalogoPage() {
               </VvCard>
             ) : (
               /* GRILLA DE FOTOGRAFÍAS */
-              <div
-                className={`grid grid-cols-1 ${
-                  isMobileView ? 'gap-6' : 'sm:grid-cols-2 lg:grid-cols-3 gap-7'
-                }`}
-              >
-                {filteredPhotos.map((photo) => (
-                  <VvCard
-                    key={photo.id}
-                    variant="surface"
-                    className="overflow-hidden flex flex-col justify-between hover:border-[#d4af37]/70 transition-all duration-300 hover:-translate-y-1 cursor-pointer group"
-                  >
-                    <div onClick={() => setDetailPhoto(photo)}>
-                      <div className="relative h-56 overflow-hidden">
-                        <img
-                          src={photo.imageUrl}
-                          alt={photo.name}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                        <div className="absolute top-3 left-3">
-                          <VvBadge variant="gold">
-                            {getCategoryName(photo.categoryId)}
-                          </VvBadge>
+              <>
+                <div
+                  className={`grid grid-cols-1 ${
+                    isMobileView ? 'gap-6' : 'sm:grid-cols-2 lg:grid-cols-3 gap-7'
+                  }`}
+                >
+                  {paginatedPhotos.map((photo) => (
+                    <VvCard
+                      key={photo.id}
+                      variant="surface"
+                      className="overflow-hidden flex flex-col justify-between hover:border-[#d4af37]/70 transition-all duration-300 hover:-translate-y-1 cursor-pointer group"
+                    >
+                      <div onClick={() => setDetailPhoto(photo)}>
+                        <div className="relative h-56 overflow-hidden">
+                          <img
+                            src={photo.imageUrl}
+                            alt={photo.name}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                          <div className="absolute top-3 left-3">
+                            <VvBadge variant="gold">
+                              {getCategoryName(photo.categoryId)}
+                            </VvBadge>
+                          </div>
+                        </div>
+
+                        <div className="p-5 space-y-2.5">
+                          <VvHeading level={3} variant="serif">
+                            {photo.name}
+                          </VvHeading>
+                          <p className="text-xs sm:text-sm vv-text-secondary leading-relaxed line-clamp-2">
+                            {photo.description}
+                          </p>
+                          <span className="text-xs text-[#D4AF37] underline inline-block">
+                            Ver Detalle y Fotos →
+                          </span>
                         </div>
                       </div>
 
-                      <div className="p-5 space-y-2.5">
-                        <VvHeading level={3} variant="serif">
-                          {photo.name}
-                        </VvHeading>
-                        <p className="text-xs sm:text-sm vv-text-secondary leading-relaxed line-clamp-2">
-                          {photo.description}
-                        </p>
-                        <span className="text-xs text-[#D4AF37] underline inline-block">
-                          Ver Detalle y Fotos →
-                        </span>
+                      <div className="p-5 pt-0">
+                        <VvButton
+                          size="md"
+                          variant="gold"
+                          onClick={() => openWhatsAppQuote(photo)}
+                          className="w-full shadow-sm hover:shadow-[0_0_16px_rgba(212,175,55,0.3)] transition-all"
+                        >
+                          Cotizar por WhatsApp
+                        </VvButton>
                       </div>
-                    </div>
+                    </VvCard>
+                  ))}
+                </div>
 
-                    <div className="p-5 pt-0">
-                      <VvButton
-                        size="md"
-                        variant="gold"
-                        onClick={() => openWhatsAppQuote(photo)}
-                        className="w-full shadow-sm hover:shadow-[0_0_16px_rgba(212,175,55,0.3)] transition-all"
-                      >
-                        Cotizar por WhatsApp
-                      </VvButton>
-                    </div>
-                  </VvCard>
-                ))}
-              </div>
+                <VvPagination
+                  currentPage={validPage}
+                  totalPages={totalPages}
+                  totalItems={filteredPhotos.length}
+                  pageSize={PAGE_SIZE}
+                  onPageChange={setCurrentPage}
+                />
+              </>
             )}
           </>
         )}

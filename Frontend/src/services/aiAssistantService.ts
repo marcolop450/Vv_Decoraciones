@@ -44,19 +44,81 @@ export const AiAssistantService = {
     const q = normalize(prompt)
     const metrics = GuardrailsService.getVerifiedMetrics(state)
 
-    // 1. ROL: FINANZAS & COBRANZAS
-    if (role === 'finanzas' || q.includes('saldo') || q.includes('plata') || q.includes('debe') || q.includes('cobrar') || q.includes('cuanto')) {
+    // Detección de intención por contenido de consulta (prevalece sobre la pestaña seleccionada)
+    const isAgendaQuery =
+      q.includes('evento') ||
+      q.includes('agenda') ||
+      q.includes('fecha') ||
+      q.includes('cuando') ||
+      q.includes('proximo') ||
+      q.includes('fin de semana') ||
+      q.includes('siguiente') ||
+      q.includes('dia')
+    const isVentasQuery =
+      q.includes('boda') ||
+      q.includes('quince') ||
+      q.includes('cumple') ||
+      q.includes('decoracion') ||
+      q.includes('catalogo') ||
+      q.includes('recomiend') ||
+      q.includes('foto')
+    const isFinanzasQuery =
+      q.includes('saldo') ||
+      q.includes('plata') ||
+      q.includes('debe') ||
+      q.includes('cobrar') ||
+      q.includes('cuanto') ||
+      q.includes('ingreso') ||
+      q.includes('cliente') ||
+      q.includes('deudor')
+
+    const effectiveRole: AgentRole = isAgendaQuery
+      ? 'agenda'
+      : isVentasQuery
+      ? 'ventas'
+      : isFinanzasQuery
+      ? 'finanzas'
+      : role
+
+    // 1. ROL: AGENDA & MONTAJES
+    if (effectiveRole === 'agenda') {
+      if (metrics.activeEvents.length === 0) {
+        return {
+          text: 'Actualmente no tienes eventos activos programados en tu agenda. Puedes registrar una nueva celebración con el botón "+ Registrar Evento".',
+          agentRole: 'agenda',
+        }
+      }
+
+      const sorted = [...metrics.activeEvents].sort((a, b) =>
+        a.date.localeCompare(b.date)
+      )
+      return {
+        text: `Tienes ${sorted.length} evento(s) activo(s) en agenda. Aquí tienes tus próximos montajes ordenados cronológicamente:`,
+        agentRole: 'agenda',
+        attachedEvents: sorted,
+      }
+    }
+
+    // 2. ROL: FINANZAS & COBRANZAS
+    if (effectiveRole === 'finanzas') {
       if (q.includes('cliente') || q.includes('deudor') || q.includes('quien')) {
         if (metrics.debtors.length === 0) {
           return {
-            text: '¡Excelente noticia! Actualmente no tienes clientes con saldos pendientes por cobrar. Todos tus eventos activos tienen los pagos al día.',
+            text: 'Excelente noticia: actualmente no tienes clientes con saldos pendientes por cobrar. Todos tus eventos tienen sus pagos al día.',
             agentRole: 'finanzas',
           }
         }
         return {
-          text: `Tienes ${metrics.debtors.length} evento(s) con saldo pendiente de cobro posterior. Aquí tienes el detalle de cada cliente:`,
+          text: `Tienes ${metrics.debtors.length} evento(s) con saldo pendiente de cobro. Aquí tienes el detalle de los clientes:`,
           agentRole: 'finanzas',
           attachedEvents: metrics.debtors,
+        }
+      }
+
+      if (metrics.totalPendingBs === 0 && metrics.totalContractedBs === 0) {
+        return {
+          text: 'Actualmente no registras eventos con movimientos financieros pendientes. Puedes registrar nuevos contratos desde el panel de eventos.',
+          agentRole: 'finanzas',
         }
       }
 
@@ -67,26 +129,8 @@ export const AiAssistantService = {
       }
     }
 
-    // 2. ROL: AGENDA & MONTAJES
-    if (role === 'agenda' || q.includes('evento') || q.includes('agenda') || q.includes('fecha') || q.includes('cuando') || q.includes('proximo') || q.includes('fin de semana')) {
-      if (metrics.activeEvents.length === 0) {
-        return {
-          text: 'No tienes eventos activos programados en tu agenda por el momento.',
-          agentRole: 'agenda',
-        }
-      }
-
-      // Ordenar por fecha cronológica ascendente
-      const sorted = [...metrics.activeEvents].sort((a, b) => a.date.localeCompare(b.date))
-      return {
-        text: `Tienes ${sorted.length} evento(s) en agenda. Aquí están tus próximos montajes ordenados por fecha:`,
-        agentRole: 'agenda',
-        attachedEvents: sorted,
-      }
-    }
-
     // 3. ROL: VENTAS & CATÁLOGO
-    if (role === 'ventas' || q.includes('boda') || q.includes('quince') || q.includes('cumple') || q.includes('decoracion') || q.includes('catalogo') || q.includes('recomiend')) {
+    if (effectiveRole === 'ventas') {
       let filteredPhotos = state.photos
 
       if (q.includes('boda') || q.includes('matrimonio') || q.includes('nupcial')) {
@@ -155,7 +199,12 @@ Datos actuales auditados:
 - Eventos activos: ${metrics.activeCount}
 - Saldo pendiente por cobrar: Bs. ${metrics.totalPendingBs.toLocaleString()}
 - Total contratado: Bs. ${metrics.totalContractedBs.toLocaleString()}
-No inventes datos que no estén aquí.`
+- Deudores registrados: ${metrics.debtors.length}
+REGLAS OBLIGATORIAS:
+- Si los eventos activos son 0, responde explícitamente que no hay eventos programados en agenda y no inventes fechas ni clientes.
+- Si el saldo pendiente es 0, confirma que todos los pagos están al día.
+- Cero emojis unicode.
+- No inventes datos que no estén respaldados por estos números.`
 
     // Paso 2A: Intentar API de Google Gemini (gemini-3.5-flash)
     if (geminiKey) {

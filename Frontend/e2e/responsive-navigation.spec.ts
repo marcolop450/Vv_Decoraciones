@@ -38,7 +38,15 @@ test.describe('Navegación Móvil y Responsividad Fluida', () => {
     await expect(menuMasBtn).toBeVisible()
     await menuMasBtn.click()
 
-    // Debe mostrar Bitácora de Auditoría
+    // Debe mostrar Bitácora de Auditoría y enlaces a nuevas páginas
     await expect(page.getByRole('button', { name: /Bitácora de Auditoría/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: /Gestión de Categorías/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: /Variables de Negocio & Teléfonos/i })).toBeVisible()
+
+    // El backdrop debe cerrar el menú al hacer clic fuera
+    const backdrop = page.locator('.fixed.inset-0.bg-black\\/75')
+    await expect(backdrop).toBeVisible()
+    await backdrop.click({ position: { x: 10, y: 10 } })
+    await expect(page.getByRole('button', { name: /Bitácora de Auditoría/i })).toBeHidden()
   })
 })

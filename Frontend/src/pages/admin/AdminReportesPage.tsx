@@ -91,7 +91,7 @@ export function AdminReportesPage() {
 
       <div
         className={`grid grid-cols-1 ${
-          isMobileView ? 'gap-6' : 'lg:grid-cols-12 gap-6'
+          isMobileView ? 'gap-6' : 'lg:grid-cols-12 gap-8'
         } items-start`}
       >
         {/* SECCIÓN DE REPORTES GENERALES */}
@@ -102,7 +102,7 @@ export function AdminReportesPage() {
               isMobileView ? 'gap-4' : 'sm:grid-cols-2 gap-4'
             }`}
           >
-            <VvCard variant="gold-highlight" className="p-5 space-y-1">
+            <VvCard variant="gold-highlight" className="p-6 space-y-2 rounded-2xl">
               <div className="text-xs uppercase tracking-wider vv-text-gold-light font-semibold">
                 Ingresos Totales Contratados
               </div>
@@ -114,7 +114,7 @@ export function AdminReportesPage() {
               </p>
             </VvCard>
 
-            <VvCard variant="surface" className="p-5 space-y-1">
+            <VvCard variant="surface" className="p-6 space-y-2 rounded-2xl">
               <div className="text-xs uppercase tracking-wider vv-text-muted font-semibold">
                 Saldos Pendientes por Cobrar
               </div>
@@ -126,7 +126,7 @@ export function AdminReportesPage() {
               </p>
             </VvCard>
 
-            <VvCard variant="surface" className="p-5 space-y-1">
+            <VvCard variant="surface" className="p-6 space-y-2 rounded-2xl">
               <div className="text-xs uppercase tracking-wider vv-text-muted font-semibold">
                 Monto Ya Recaudado (Adelantos + Cerrados)
               </div>
@@ -138,7 +138,7 @@ export function AdminReportesPage() {
               </p>
             </VvCard>
 
-            <VvCard variant="surface" className="p-5 space-y-1">
+            <VvCard variant="surface" className="p-6 space-y-2 rounded-2xl">
               <div className="text-xs uppercase tracking-wider vv-text-muted font-semibold">
                 Decoraciones en Catálogo
               </div>
@@ -152,7 +152,7 @@ export function AdminReportesPage() {
           </div>
 
           {/* Cantidad de Eventos por Categoría */}
-          <VvCard variant="surface" className="p-6 space-y-4">
+          <VvCard variant="surface" className="p-6 space-y-4 rounded-2xl">
             <div className="flex items-center justify-between">
               <VvHeading level={3} variant="serif">
                 Cantidad de Eventos por Categoría
@@ -201,7 +201,7 @@ export function AdminReportesPage() {
             variant="gold-highlight"
             className={`${
               isMobileView ? '' : 'lg:col-span-6'
-            } p-5 sm:p-6 flex flex-col justify-between space-y-4`}
+            } p-6 sm:p-7 flex flex-col justify-between space-y-5 rounded-2xl`}
           >
           <div className="flex flex-col gap-3 pb-3 border-b vv-border-gold">
             <div className="flex items-center justify-between gap-2">
@@ -223,7 +223,7 @@ export function AdminReportesPage() {
               <button
                 type="button"
                 onClick={() => setSelectedAgent('finanzas')}
-                className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
+                className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                   selectedAgent === 'finanzas'
                     ? 'vv-bg-gold-gradient vv-text-on-gold shadow-sm'
                     : 'vv-text-secondary hover:vv-text-primary'
@@ -234,7 +234,7 @@ export function AdminReportesPage() {
               <button
                 type="button"
                 onClick={() => setSelectedAgent('agenda')}
-                className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
+                className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                   selectedAgent === 'agenda'
                     ? 'vv-bg-gold-gradient vv-text-on-gold shadow-sm'
                     : 'vv-text-secondary hover:vv-text-primary'
@@ -245,7 +245,7 @@ export function AdminReportesPage() {
               <button
                 type="button"
                 onClick={() => setSelectedAgent('ventas')}
-                className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
+                className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                   selectedAgent === 'ventas'
                     ? 'vv-bg-gold-gradient vv-text-on-gold shadow-sm'
                     : 'vv-text-secondary hover:vv-text-primary'
@@ -257,7 +257,7 @@ export function AdminReportesPage() {
           </div>
 
           {/* Historial de Conversación */}
-          <div className="space-y-4 max-h-96 overflow-y-auto pr-1">
+          <div className="space-y-4 max-h-[460px] overflow-y-auto pr-1">
             {state.reportChat.map((msg) => (
               <div
                 key={msg.id}
@@ -266,9 +266,9 @@ export function AdminReportesPage() {
                 }`}
               >
                 <div
-                  className={`max-w-lg px-4 py-3 rounded-2xl text-xs sm:text-sm leading-relaxed space-y-3 ${
+                  className={`max-w-lg px-4 py-3.5 sm:px-5 sm:py-4 rounded-2xl text-xs sm:text-sm leading-relaxed space-y-3 shadow-xs ${
                     msg.sender === 'user'
-                      ? 'vv-bg-gold-gradient vv-text-on-gold font-semibold'
+                      ? 'vv-bg-gold-gradient vv-text-on-gold font-medium'
                       : 'vv-bg-surface border vv-border-gold vv-text-primary'
                   }`}
                 >
@@ -356,12 +356,12 @@ export function AdminReportesPage() {
           </div>
 
           {/* Botones de Consulta Rápida por Defecto + Input */}
-          <div className="space-y-3 pt-3 border-t vv-border-gold">
-            <div className="space-y-1">
+          <div className="space-y-4 pt-4 border-t vv-border-gold">
+            <div className="space-y-1.5">
               <span className="text-[11px] font-semibold uppercase tracking-wider vv-text-muted">
                 Preguntas sugeridas:
               </span>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-2">
                 {agentDefaultPrompts[selectedAgent].map((prompt) => (
                   <VvButton
                     key={prompt}

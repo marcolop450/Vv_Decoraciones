@@ -15,6 +15,9 @@ import {
 import { useVvApp } from '../../context/VvAppContext'
 import { GALLERY_PRESET_IMAGES } from '../../data/vvInitialAppData'
 import type { CatalogPhoto } from '../../types/vv-app'
+import { VvPagination } from '../../components/ui/VvPagination'
+
+const PAGE_SIZE = 8
 
 export function AdminFotosPage() {
   const {
@@ -30,6 +33,7 @@ export function AdminFotosPage() {
   const [editingPhoto, setEditingPhoto] = useState<CatalogPhoto | null>(null)
   const [detailPhoto, setDetailPhoto] = useState<CatalogPhoto | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [currentPage, setCurrentPage] = useState(1)
 
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
@@ -43,6 +47,18 @@ export function AdminFotosPage() {
     if (selectedCategory === 'all') return true
     return p.categoryId === selectedCategory
   })
+
+  const totalPages = Math.ceil(filteredPhotos.length / PAGE_SIZE) || 1
+  const validPage = Math.min(currentPage, totalPages)
+  const paginatedPhotos = filteredPhotos.slice(
+    (validPage - 1) * PAGE_SIZE,
+    validPage * PAGE_SIZE
+  )
+
+  const handleCategoryChange = (catId: string) => {
+    setSelectedCategory(catId)
+    setCurrentPage(1)
+  }
 
   const openCreateModal = () => {
     setEditingPhoto(null)
@@ -182,7 +198,7 @@ export function AdminFotosPage() {
             <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
               <button
                 type="button"
-                onClick={() => setSelectedCategory('all')}
+                onClick={() => handleCategoryChange('all')}
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                   selectedCategory === 'all'
                     ? 'vv-bg-gold-gradient vv-text-on-gold shadow-sm'
@@ -197,7 +213,7 @@ export function AdminFotosPage() {
                   <button
                     key={cat.id}
                     type="button"
-                    onClick={() => setSelectedCategory(cat.id)}
+                    onClick={() => handleCategoryChange(cat.id)}
                     className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                       selectedCategory === cat.id
                         ? 'vv-bg-gold-gradient vv-text-on-gold shadow-sm'
@@ -266,63 +282,73 @@ export function AdminFotosPage() {
               </VvButton>
             </div>
           ) : (
-            <div
-              className={`grid grid-cols-1 ${
-                isMobileView ? 'gap-5' : 'sm:grid-cols-2 lg:grid-cols-3 gap-6'
-              }`}
-            >
-              {filteredPhotos.map((photo) => (
-                <VvCard
-                  key={photo.id}
-                  variant="surface"
-                  className="overflow-hidden flex flex-col justify-between hover:border-[#D4AF37] transition-all cursor-pointer group"
-                >
-                  <div onClick={() => setDetailPhoto(photo)}>
-                    <div className="relative h-52 overflow-hidden">
-                      <img
-                        src={photo.imageUrl}
-                        alt={photo.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute top-3 left-3">
-                        <VvBadge variant="gold">
-                          {getCategoryName(photo.categoryId)}
-                        </VvBadge>
+            <>
+              <div
+                className={`grid grid-cols-1 ${
+                  isMobileView ? 'gap-5' : 'sm:grid-cols-2 lg:grid-cols-3 gap-6'
+                }`}
+              >
+                {paginatedPhotos.map((photo) => (
+                  <VvCard
+                    key={photo.id}
+                    variant="surface"
+                    className="overflow-hidden flex flex-col justify-between hover:border-[#D4AF37] transition-all cursor-pointer group"
+                  >
+                    <div onClick={() => setDetailPhoto(photo)}>
+                      <div className="relative h-52 overflow-hidden">
+                        <img
+                          src={photo.imageUrl}
+                          alt={photo.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute top-3 left-3">
+                          <VvBadge variant="gold">
+                            {getCategoryName(photo.categoryId)}
+                          </VvBadge>
+                        </div>
+                      </div>
+
+                      <div className="p-5 space-y-2">
+                        <VvHeading level={4} variant="serif">
+                          {photo.name}
+                        </VvHeading>
+                        <p className="text-xs vv-text-secondary leading-relaxed line-clamp-2">
+                          {photo.description}
+                        </p>
+                        <span className="text-xs vv-text-gold-light underline inline-block pt-1">
+                          Ver Detalles →
+                        </span>
                       </div>
                     </div>
 
-                    <div className="p-5 space-y-2">
-                      <VvHeading level={4} variant="serif">
-                        {photo.name}
-                      </VvHeading>
-                      <p className="text-xs vv-text-secondary leading-relaxed line-clamp-2">
-                        {photo.description}
-                      </p>
-                      <span className="text-xs vv-text-gold-light underline inline-block pt-1">
-                        Ver Detalles →
-                      </span>
+                    <div className="p-4 pt-3 border-t vv-border-gold flex items-center justify-end gap-2">
+                      <VvButton
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openEditModal(photo)}
+                      >
+                        Editar
+                      </VvButton>
+                      <VvButton
+                        size="sm"
+                        variant="danger"
+                        onClick={() => handleDelete(photo)}
+                      >
+                        Eliminar
+                      </VvButton>
                     </div>
-                  </div>
+                  </VvCard>
+                ))}
+              </div>
 
-                  <div className="p-4 pt-3 border-t vv-border-gold flex items-center justify-end gap-2">
-                    <VvButton
-                      size="sm"
-                      variant="outline"
-                      onClick={() => openEditModal(photo)}
-                    >
-                      Editar
-                    </VvButton>
-                    <VvButton
-                      size="sm"
-                      variant="danger"
-                      onClick={() => handleDelete(photo)}
-                    >
-                      Eliminar
-                    </VvButton>
-                  </div>
-                </VvCard>
-              ))}
-            </div>
+              <VvPagination
+                currentPage={validPage}
+                totalPages={totalPages}
+                totalItems={filteredPhotos.length}
+                pageSize={PAGE_SIZE}
+                onPageChange={setCurrentPage}
+              />
+            </>
           )}
         </div>
       )}

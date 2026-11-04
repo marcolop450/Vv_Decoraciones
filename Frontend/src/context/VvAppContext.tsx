@@ -30,6 +30,8 @@ const VALID_ROUTES: AppRoute[] = [
   '/admin/calendario',
   '/admin/reportes',
   '/admin/bitacora',
+  '/admin/categorias',
+  '/admin/configuracion',
 ]
 
 interface VvAppContextValue {
@@ -211,7 +213,7 @@ export function VvAppProvider({ children }: { children: React.ReactNode }) {
           .select('*')
           .order('fecha_evento', { ascending: true })
 
-        if (eventData && (eventData as any[]).length > 0 && isMounted) {
+        if (eventData && Array.isArray(eventData) && isMounted) {
           setState((prev) => ({
             ...prev,
             events: (eventData as any[]).map((e) => ({
@@ -235,7 +237,7 @@ export function VvAppProvider({ children }: { children: React.ReactNode }) {
           .select('*')
           .order('created_at', { ascending: false })
 
-        if (photosData && (photosData as any[]).length > 0 && isMounted) {
+        if (photosData && Array.isArray(photosData) && isMounted) {
           setState((prev) => ({
             ...prev,
             photos: (photosData as any[]).map((p) => ({
@@ -351,7 +353,7 @@ export function VvAppProvider({ children }: { children: React.ReactNode }) {
         }
         logBitacora(
           'Login Exitoso',
-          `Inicio de sesión exitoso del propietario (${cleanEmail}).`,
+          'Inicio de sesión exitoso de la Propietaria (Panel de Administración).',
           'Éxito'
         )
         navigate('/admin/inicio')
@@ -371,7 +373,7 @@ export function VvAppProvider({ children }: { children: React.ReactNode }) {
       }
       logBitacora(
         'Login Exitoso',
-        `Inicio de sesión exitoso del propietario (${cleanEmail}).`,
+        'Inicio de sesión exitoso de la Propietaria (Panel de Administración).',
         'Éxito'
       )
       navigate('/admin/inicio')

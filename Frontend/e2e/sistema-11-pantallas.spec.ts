@@ -70,26 +70,23 @@ test.describe('Sistema 11 Pantallas Figma - Eventos Vero', () => {
   test('4. Gestión de Categorías: Crear, Editar y Eliminar', async ({ page }) => {
     await loginAsAdmin(page)
 
-    // Abrir modal de Gestión de Categorías
+    // Navegar a la página dedicada de Gestión de Categorías
     await page.getByRole('button', { name: /Gestión de Categorías/i }).first().click()
-    const catModal = page.getByRole('dialog', { name: /Gestión de Categorías de Decoración/i })
-    await expect(catModal).toBeVisible()
+    await expect(page).toHaveURL(/.*\/admin\/categorias/)
+    await expect(page.getByRole('heading', { name: /Gestión de Categorías/i })).toBeVisible()
 
     // Crear nueva categoría de prueba
     await page.getByLabel(/Nombre de la Nueva Categoría/i).fill('Categoria Temporal E2E')
-    await page.getByRole('button', { name: /\+ Crear/i }).click()
+    await page.getByRole('button', { name: /\+ Crear Categoría/i }).click()
     await expect(page.getByText('Categoria Temporal E2E')).toBeVisible()
 
     // Eliminar la categoría creada para dejar la base de datos limpia
-    await page.getByRole('button', { name: /Eliminar/i }).first().click()
-    const confirmBtn = page.getByRole('button', { name: /Sí, eliminar/i })
+    const deleteBtn = page.getByRole('button', { name: /^Eliminar$/i }).last()
+    await deleteBtn.click()
+    const confirmBtn = page.getByRole('button', { name: /Sí, Eliminar/i })
     if (await confirmBtn.isVisible()) {
       await confirmBtn.click()
     }
-
-    // Cerrar modal
-    await catModal.getByRole('button', { name: /✕ Cerrar/i }).click()
-    await expect(catModal).toBeHidden()
   })
 
   test('5. Gestión de Eventos y Nuevo: /admin/eventos y /admin/eventos/nuevo', async ({ page }) => {
@@ -231,24 +228,17 @@ test.describe('Sistema 11 Pantallas Figma - Eventos Vero', () => {
     await loginAsAdmin(page)
     await page.goto('/admin/bitacora')
     await expect(page).toHaveTitle(/bitacora/i)
-    await expect(page.getByRole('heading', { name: /Bitácora de la Página/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /Bitácora/i })).toBeVisible()
 
-    // Filtros de estado
-    await expect(page.getByRole('button', { name: /Estado: Éxito/i })).toBeVisible()
-    await expect(page.getByRole('button', { name: /Estado: Fallo/i })).toBeVisible()
+    // Filtros de estado y buscador
+    await expect(page.getByRole('button', { name: /Éxito/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: /Fallo/i })).toBeVisible()
+    await expect(page.getByPlaceholder(/Buscar por acción, fecha o detalle/i)).toBeVisible()
 
-    // Probar simulación de fallo
-    await page.getByRole('button', { name: /Simular Registro de Fallo/i }).click()
-    await expect(page.getByText(/Error de Operación/i).first()).toBeVisible()
-
-    // Abrir modal de Variables de Negocio
+    // Navegar a la página dedicada de Variables de Negocio
     await page.getByRole('button', { name: /Variables & Teléfonos/i }).first().click()
-    const varModal = page.getByRole('dialog', { name: /Variables de Negocio y Teléfonos/i })
-    await expect(varModal).toBeVisible()
-
-    // Cerrar modal
-    await varModal.getByRole('button', { name: /✕ Cerrar/i }).click()
-    await expect(varModal).toBeHidden()
+    await expect(page).toHaveURL(/.*\/admin\/configuracion/)
+    await expect(page.getByRole('heading', { name: /Variables de Negocio & Teléfonos/i })).toBeVisible()
   })
 
   test('11. Responsividad Nativa: Navegación Móvil Real', async ({ page }) => {

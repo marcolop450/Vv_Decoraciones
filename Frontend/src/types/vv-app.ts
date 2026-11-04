@@ -10,6 +10,8 @@ export type AppRoute =
   | '/admin/calendario'
   | '/admin/reportes'
   | '/admin/bitacora'
+  | '/admin/categorias'
+  | '/admin/configuracion'
 
 export interface CatalogCategory {
   id: string

@@ -11,6 +11,8 @@ import { AdminEventoDetallePage } from './pages/admin/AdminEventoDetallePage'
 import { AdminCalendarioPage } from './pages/admin/AdminCalendarioPage'
 import { AdminReportesPage } from './pages/admin/AdminReportesPage'
 import { AdminBitacoraPage } from './pages/admin/AdminBitacoraPage'
+import { AdminCategoriasPage } from './pages/admin/AdminCategoriasPage'
+import { AdminConfiguracionPage } from './pages/admin/AdminConfiguracionPage'
 
 function VvRouterSwitch() {
   const { currentRoute, isAuthenticated, isAuthLoading, navigate } = useVvApp()
@@ -61,6 +63,10 @@ function VvRouterSwitch() {
       return <AdminReportesPage />
     case '/admin/bitacora':
       return <AdminBitacoraPage />
+    case '/admin/categorias':
+      return <AdminCategoriasPage />
+    case '/admin/configuracion':
+      return <AdminConfiguracionPage />
     default:
       return <LandingPage />
   }

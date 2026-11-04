@@ -3,8 +3,6 @@ import vvLogo from '../../assets/vv-logo.png'
 import { useVvApp } from '../../context/VvAppContext'
 import type { AppRoute } from '../../types/vv-app'
 import { VvBadge, VvButton, VvHeading } from '../ui/VvPrimitives'
-import { BusinessConfigModal } from '../modals/BusinessConfigModal'
-import { CategoryManagementModal } from '../modals/CategoryManagementModal'
 
 interface NavItem {
   route: AppRoute
@@ -103,8 +101,6 @@ export function AdminLayout({
 }) {
   const { currentRoute, navigate, logoutOwner } = useVvApp()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [configModalOpen, setConfigModalOpen] = useState(false)
-  const [catModalOpen, setCatModalOpen] = useState(false)
 
   const isRouteActive = (itemRoute: AppRoute) => {
     if (
@@ -119,58 +115,60 @@ export function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen vv-bg-base vv-text-primary flex flex-col md:flex-row">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden vv-bg-base vv-text-primary flex flex-col md:flex-row">
       {/* Sidebar de escritorio (visible solo en >= 768px) */}
-      <aside className="hidden md:flex md:w-64 vv-bg-surface border-r vv-border-gold flex-col shrink-0 sticky top-0 h-screen">
-        <div className="p-6 border-b vv-border-gold">
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={() => navigate('/admin/inicio')}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                navigate('/admin/inicio')
-              }
-            }}
-            className="flex items-center gap-3 cursor-pointer select-none"
-          >
-            <img
-              src={vvLogo}
-              alt="Logo V.v"
-              className="w-11 h-11 rounded-xl object-contain border vv-border-gold-strong vv-bg-base p-0.5 shrink-0"
-            />
-            <div>
-              <div className="vv-font-serif font-bold text-lg vv-text-gold-metallic leading-tight">
-                V.v Eventos
+      <aside className="hidden md:flex md:w-64 vv-bg-surface border-r vv-border-gold flex-col justify-between shrink-0 sticky top-0 h-screen overflow-y-auto z-30">
+        <div>
+          <div className="p-6 border-b vv-border-gold">
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => navigate('/admin/inicio')}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  navigate('/admin/inicio')
+                }
+              }}
+              className="flex items-center gap-3 cursor-pointer select-none"
+            >
+              <img
+                src={vvLogo}
+                alt="Logo V.v"
+                className="w-11 h-11 rounded-xl object-contain border vv-border-gold-strong vv-bg-base p-0.5 shrink-0"
+              />
+              <div>
+                <div className="vv-font-serif font-bold text-lg vv-text-gold-metallic leading-tight">
+                  V.v Eventos
+                </div>
+                <VvBadge variant="gold" className="text-[10px] mt-1">
+                  Panel del Dueño
+                </VvBadge>
               </div>
-              <VvBadge variant="gold" className="text-[10px] mt-1">
-                Panel del Dueño
-              </VvBadge>
             </div>
           </div>
-        </div>
 
-        <nav aria-label="Menú del Administrador" className="flex-1 p-4 space-y-1.5 overflow-y-auto">
-          {ADMIN_NAV_ITEMS.map((item) => {
-            const active = isRouteActive(item.route)
-            return (
-              <button
-                key={item.route}
-                type="button"
-                onClick={() => navigate(item.route)}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all text-left ${
-                  active
-                    ? 'vv-bg-gold-gradient vv-text-on-gold font-semibold shadow-sm'
-                    : 'vv-text-secondary hover:vv-text-primary hover:vv-bg-subtle'
-                }`}
-              >
-                <span>{item.icon}</span>
-                <span>{item.label}</span>
-              </button>
-            )
-          })}
-        </nav>
+          <nav aria-label="Menú del Administrador" className="p-4 space-y-1.5">
+            {ADMIN_NAV_ITEMS.map((item) => {
+              const active = isRouteActive(item.route)
+              return (
+                <button
+                  key={item.route}
+                  type="button"
+                  onClick={() => navigate(item.route)}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all text-left ${
+                    active
+                      ? 'vv-bg-gold-gradient vv-text-on-gold font-semibold shadow-sm'
+                      : 'vv-text-secondary hover:vv-text-primary hover:vv-bg-subtle'
+                  }`}
+                >
+                  <span>{item.icon}</span>
+                  <span>{item.label}</span>
+                </button>
+              )
+            })}
+          </nav>
+        </div>
 
         <div className="p-4 border-t vv-border-gold space-y-2">
           <div className="text-[10px] font-semibold uppercase tracking-wider vv-text-muted px-1">
@@ -178,9 +176,9 @@ export function AdminLayout({
           </div>
           <VvButton
             size="sm"
-            variant="outline"
+            variant={currentRoute === '/admin/categorias' ? 'gold' : 'outline'}
             className="w-full justify-start gap-2"
-            onClick={() => setCatModalOpen(true)}
+            onClick={() => navigate('/admin/categorias')}
           >
             <svg
               className="w-4 h-4 shrink-0"
@@ -199,9 +197,9 @@ export function AdminLayout({
 
           <VvButton
             size="sm"
-            variant="outline"
+            variant={currentRoute === '/admin/configuracion' ? 'gold' : 'outline'}
             className="w-full justify-start gap-2"
-            onClick={() => setConfigModalOpen(true)}
+            onClick={() => navigate('/admin/configuracion')}
           >
             <svg
               className="w-4 h-4 shrink-0"
@@ -228,7 +226,7 @@ export function AdminLayout({
           <button
             type="button"
             onClick={logoutOwner}
-            className="w-full px-3 py-2 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors text-left font-medium"
+            className="w-full px-3 py-2 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors text-left font-medium cursor-pointer"
           >
             Cerrar Sesión
           </button>
@@ -271,94 +269,101 @@ export function AdminLayout({
         </button>
       </header>
 
-      {/* Menú desplegable móvil */}
+      {/* Menú desplegable móvil con Backdrop Overlay */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed top-[54px] inset-x-3 z-40 p-3.5 rounded-2xl vv-bg-surface border border-[#d4af37]/40 shadow-[0_12px_40px_rgba(0,0,0,0.9)] space-y-1.5 vv-animate-modal backdrop-blur-xl">
-          <div className="text-[11px] font-semibold uppercase tracking-wider vv-text-gold-light pb-2 px-2 border-b vv-border-gold flex items-center justify-between">
-            <span>Módulos y Configuración</span>
-            <span className="text-[10px] vv-text-muted">Eventos Vero</span>
-          </div>
+        <>
+          <div
+            className="md:hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-30 vv-animate-fade"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+          <div className="md:hidden fixed top-[54px] inset-x-3 z-40 p-3.5 rounded-2xl vv-bg-surface border border-[#d4af37]/40 shadow-[0_12px_40px_rgba(0,0,0,0.9)] space-y-1.5 vv-animate-modal backdrop-blur-xl">
+            <div className="text-[11px] font-semibold uppercase tracking-wider vv-text-gold-light pb-2 px-2 border-b vv-border-gold flex items-center justify-between">
+              <span>Módulos y Configuración</span>
+              <span className="text-[10px] vv-text-muted">Eventos Vero</span>
+            </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              navigate('/admin/bitacora')
-              setMobileMenuOpen(false)
-            }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs vv-text-primary hover:vv-bg-subtle text-left transition-colors cursor-pointer"
-          >
-            <svg className="w-4 h-4 vv-text-gold shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-              <polyline points="14 2 14 8 20 8" />
-            </svg>
-            <span className="font-medium">Bitácora de Auditoría</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setCatModalOpen(true)
-              setMobileMenuOpen(false)
-            }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs vv-text-primary hover:vv-bg-subtle text-left transition-colors cursor-pointer"
-          >
-            <svg className="w-4 h-4 vv-text-gold shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="3" width="7" height="7" />
-              <rect x="14" y="3" width="7" height="7" />
-              <rect x="14" y="14" width="7" height="7" />
-              <rect x="3" y="14" width="7" height="7" />
-            </svg>
-            <span className="font-medium">Gestión de Categorías</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setConfigModalOpen(true)
-              setMobileMenuOpen(false)
-            }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs vv-text-primary hover:vv-bg-subtle text-left transition-colors cursor-pointer"
-          >
-            <svg className="w-4 h-4 vv-text-gold shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="3" />
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-            </svg>
-            <span className="font-medium">Variables de Negocio & Teléfonos</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              navigate('/landing')
-              setMobileMenuOpen(false)
-            }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs vv-text-secondary hover:vv-bg-subtle text-left transition-colors cursor-pointer"
-          >
-            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="2" y1="12" x2="22" y2="12" />
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-            </svg>
-            <span>Ver Sitio Web Público</span>
-          </button>
-
-          <div className="pt-2 border-t vv-border-gold">
             <button
               type="button"
               onClick={() => {
+                navigate('/admin/bitacora')
                 setMobileMenuOpen(false)
-                logoutOwner()
               }}
-              className="w-full px-3 py-2 rounded-xl text-xs text-red-400 hover:bg-red-500/10 text-left font-medium transition-colors cursor-pointer"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs vv-text-primary hover:vv-bg-subtle text-left transition-colors cursor-pointer"
             >
-              Cerrar Sesión del Dueño
+              <svg className="w-4 h-4 vv-text-gold shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+              <span className="font-medium">Bitácora de Auditoría</span>
             </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                navigate('/admin/categorias')
+                setMobileMenuOpen(false)
+              }}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs vv-text-primary hover:vv-bg-subtle text-left transition-colors cursor-pointer"
+            >
+              <svg className="w-4 h-4 vv-text-gold shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+              </svg>
+              <span className="font-medium">Gestión de Categorías</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                navigate('/admin/configuracion')
+                setMobileMenuOpen(false)
+              }}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs vv-text-primary hover:vv-bg-subtle text-left transition-colors cursor-pointer"
+            >
+              <svg className="w-4 h-4 vv-text-gold shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+              </svg>
+              <span className="font-medium">Variables de Negocio & Teléfonos</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                navigate('/landing')
+                setMobileMenuOpen(false)
+              }}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs vv-text-secondary hover:vv-bg-subtle text-left transition-colors cursor-pointer"
+            >
+              <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
+              <span>Ver Sitio Web Público</span>
+            </button>
+
+            <div className="pt-2 border-t vv-border-gold">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false)
+                  logoutOwner()
+                }}
+                className="w-full px-3 py-2 rounded-xl text-xs text-red-400 hover:bg-red-500/10 text-left font-medium transition-colors cursor-pointer"
+              >
+                Cerrar Sesión del Dueño
+              </button>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* Contenido principal */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* Contenido principal antidesbordamiento */}
+      <div className="min-w-0 flex-1 flex flex-col overflow-x-hidden">
         {/* Header escritorio (solo visible en >= 768px) */}
         <header className="hidden md:flex sticky top-0 z-20 vv-bg-glass border-b vv-border-gold px-6 py-4 items-center justify-between gap-4">
           <div>
@@ -418,16 +423,6 @@ export function AdminLayout({
           })}
         </nav>
       )}
-
-      <BusinessConfigModal
-        isOpen={configModalOpen}
-        onClose={() => setConfigModalOpen(false)}
-      />
-
-      <CategoryManagementModal
-        isOpen={catModalOpen}
-        onClose={() => setCatModalOpen(false)}
-      />
     </div>
   )
 }
